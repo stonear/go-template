@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"github.com/joho/godotenv"
 	"github.com/stonear/go-template/controller"
 	"github.com/stonear/go-template/database"
@@ -17,6 +18,11 @@ func main() {
 	helper.Panic(err)
 
 	db := database.New()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		helper.Panic(err)
+	}(db)
+
 	personRepository := repository.New()
 	personService := service.New(personRepository, db)
 	personController := controller.New(personService)

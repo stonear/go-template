@@ -18,12 +18,6 @@ func New() *sql.DB {
 	connStr := "postgresql://" + envUsername + ":" + envPassword + "@" + envHost + ":" + envPort + "/" + envDatabase + "?sslmode=disable"
 	db, err := sql.Open(os.Getenv("DB_CONNECTION"), connStr)
 	helper.Panic(err)
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			helper.Panic(err)
-		}
-	}(db)
 
 	return db
 }
