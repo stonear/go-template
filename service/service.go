@@ -45,8 +45,10 @@ func (s *service) Delete(ctx context.Context, id int) (int, error) {
 }
 
 func (s service) FindById(ctx context.Context, id int) entity.Person {
-	//TODO implement me
-	panic("implement me")
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	person := s.Repository.FindById(ctx, tx, id)
+	return person
 }
 
 func (s service) FindAll(ctx context.Context) []entity.Person {

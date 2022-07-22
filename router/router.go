@@ -9,6 +9,7 @@ func New(c controller.Controller) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/api/persons", c.FindAll)
+	r.GET("/api/person/:id", c.FindById)
 
 	return r
 }

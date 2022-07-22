@@ -38,8 +38,15 @@ func (r *repository) Delete(ctx context.Context, tx *sql.Tx, id int) (int, error
 }
 
 func (r repository) FindById(ctx context.Context, tx *sql.Tx, id int) entity.Person {
-	//TODO implement me
-	panic("implement me")
+	query := "SELECT id, name FROM person WHERE id = $1"
+	rows, err := tx.QueryContext(ctx, query, id)
+	helper.Panic(err)
+	person := entity.Person{}
+	if rows.Next() {
+		err := rows.Scan(&person.ID, &person.Name)
+		helper.Panic(err)
+	}
+	return person
 }
 
 func (r repository) FindAll(ctx context.Context, tx *sql.Tx) []entity.Person {
