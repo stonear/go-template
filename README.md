@@ -26,3 +26,9 @@ DELETE | /entities/:id | Destroy
 ## Testing
 
 If you are using VSCode, I recommend you to use [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) Extension for running ```apitest.http```.
+
+To check if the database connected successfully, you can run the following command:
+
+```go test -timeout 30s -run ^TestDb$ github.com/stonear/go-template/database```
+
+Files with the suffix ```_test.go``` are only compiled and run by the ```go test``` tool.

@@ -7,7 +7,7 @@ import (
 	"github.com/stonear/go-template/helper"
 )
 
-func TestNew(t *testing.T) {
+func TestDb(t *testing.T) {
 	err := godotenv.Load("../.env")
 	helper.Panic(err)
 	New()
