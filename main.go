@@ -2,6 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"net/http"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/stonear/go-template/controller"
 	"github.com/stonear/go-template/database"
@@ -9,8 +12,6 @@ import (
 	"github.com/stonear/go-template/repository"
 	"github.com/stonear/go-template/router"
 	"github.com/stonear/go-template/service"
-	"net/http"
-	"os"
 )
 
 func main() {

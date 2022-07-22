@@ -1,10 +1,11 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/stonear/go-template/entity"
 	"github.com/stonear/go-template/service"
-	"net/http"
 )
 
 type Controller interface {

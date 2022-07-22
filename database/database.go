@@ -2,10 +2,10 @@ package database
 
 import (
 	"database/sql"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	//"github.com/jackc/pgx/v4"
-	"github.com/stonear/go-template/helper"
 	"os"
+
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/stonear/go-template/helper"
 )
 
 func New() *sql.DB {

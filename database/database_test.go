@@ -1,9 +1,10 @@
 package database
 
 import (
+	"testing"
+
 	"github.com/joho/godotenv"
 	"github.com/stonear/go-template/helper"
-	"testing"
 )
 
 func TestNew(t *testing.T) {
