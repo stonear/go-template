@@ -18,7 +18,7 @@ func Database() *sql.DB {
 	// if env database is set, use it
 	envConnection := os.Getenv("DB_CONNECTION")
 
-	if envConnection == "pgsql" {
+	if envConnection == "pgx" {
 		envHost := os.Getenv("DB_HOST")
 		envPort := os.Getenv("DB_PORT")
 		envDatabase := os.Getenv("DB_DATABASE")
