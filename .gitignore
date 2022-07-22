@@ -22,3 +22,6 @@ go.work
 
 # Dotenv environment variables file
 .env
+
+# Others
+.idea/
