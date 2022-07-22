@@ -15,8 +15,15 @@ func New() *sql.DB {
 	envUsername := os.Getenv("DB_USERNAME")
 	envPassword := os.Getenv("DB_PASSWORD")
 
-	connStr := "postgresql://" + envUsername + ":" + envPassword + "@" + envHost + ":" + envPort + "/" + envDatabase + "?sslmode=disable"
-	db, err := sql.Open(os.Getenv("DB_CONNECTION"), connStr)
+	driver := os.Getenv("DB_CONNECTION")
+	connStr := ""
+	if driver == "pgx" {
+		connStr = "postgresql://" + envUsername + ":" + envPassword + "@" + envHost + ":" + envPort + "/" + envDatabase + "?sslmode=disable"
+	}
+
+	// TODO: add support for other drivers
+
+	db, err := sql.Open(driver, connStr)
 	helper.Panic(err)
 
 	return db
