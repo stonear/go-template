@@ -1,20 +1,24 @@
 package controller
 
 import (
-	"io"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gin-gonic/gin"
 )
 
 type Hello struct {
 	// to do add properties
 }
 
-func (h *Hello) Default(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	io.WriteString(w, "Hello world!\n")
+func (h *Hello) Default(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Hello world!\n",
+	})
 }
 
-func (h *Hello) Name(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	io.WriteString(w, "Hello "+p.ByName("name")+"!\n")
+func (h *Hello) Name(c *gin.Context) {
+	name := c.Param("name")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Hello " + name + "!\n",
+	})
 }

@@ -1,12 +1,12 @@
 package routes
 
 import (
-	"github.com/julienschmidt/httprouter"
+	"github.com/gin-gonic/gin"
 	controller "github.com/stonear/go-template/app/http/controllers"
 )
 
-func Api() *httprouter.Router {
-	router := httprouter.New()
+func Api() *gin.Engine {
+	router := gin.Default()
 
 	hello := controller.Hello{}
 	router.GET("/", hello.Default)
