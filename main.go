@@ -34,7 +34,6 @@ func main() {
 		Handler: r,
 	}
 
-	if err := server.ListenAndServe(); err != nil {
-		helper.Panic(err)
-	}
+	err = server.ListenAndServe()
+	helper.Panic(err)
 }

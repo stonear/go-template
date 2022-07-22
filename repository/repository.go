@@ -9,11 +9,11 @@ import (
 )
 
 type Repository interface {
-	Save(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
+	Index(ctx context.Context, tx *sql.Tx) []entity.Person
+	Show(ctx context.Context, tx *sql.Tx, id int) entity.Person
+	Create(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
 	Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
-	Delete(ctx context.Context, tx *sql.Tx, id int) (int, error)
-	FindById(ctx context.Context, tx *sql.Tx, id int) entity.Person
-	FindAll(ctx context.Context, tx *sql.Tx) []entity.Person
+	Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error)
 }
 
 func New() Repository {
@@ -22,22 +22,7 @@ func New() Repository {
 
 type repository struct{}
 
-func (r *repository) Save(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (r *repository) Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (r *repository) Delete(ctx context.Context, tx *sql.Tx, id int) (int, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (r repository) FindById(ctx context.Context, tx *sql.Tx, id int) entity.Person {
+func (r repository) Show(ctx context.Context, tx *sql.Tx, id int) entity.Person {
 	query := "SELECT id, name FROM person WHERE id = $1"
 	rows, err := tx.QueryContext(ctx, query, id)
 	helper.Panic(err)
@@ -49,7 +34,7 @@ func (r repository) FindById(ctx context.Context, tx *sql.Tx, id int) entity.Per
 	return person
 }
 
-func (r repository) FindAll(ctx context.Context, tx *sql.Tx) []entity.Person {
+func (r repository) Index(ctx context.Context, tx *sql.Tx) []entity.Person {
 	query := "SELECT id, name FROM person"
 	rows, err := tx.QueryContext(ctx, query)
 	helper.Panic(err)
@@ -63,4 +48,19 @@ func (r repository) FindAll(ctx context.Context, tx *sql.Tx) []entity.Person {
 	}
 
 	return persons
+}
+
+func (r *repository) Create(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *repository) Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *repository) Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error) {
+	//TODO implement me
+	panic("implement me")
 }

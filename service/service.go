@@ -10,11 +10,11 @@ import (
 )
 
 type Service interface {
+	Index(ctx context.Context) []entity.Person
+	Show(ctx context.Context, id int) entity.Person
 	Create(ctx context.Context, person entity.Person) (int, error)
 	Update(ctx context.Context, person entity.Person) (int, error)
-	Delete(ctx context.Context, id int) (int, error)
-	FindById(ctx context.Context, id int) entity.Person
-	FindAll(ctx context.Context) []entity.Person
+	Destroy(ctx context.Context, id int) (int, error)
 }
 
 func New(repo repository.Repository, db *sql.DB) Service {
@@ -29,6 +29,20 @@ type service struct {
 	DB         *sql.DB
 }
 
+func (s service) Show(ctx context.Context, id int) entity.Person {
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	person := s.Repository.Show(ctx, tx, id)
+	return person
+}
+
+func (s service) Index(ctx context.Context) []entity.Person {
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	persons := s.Repository.Index(ctx, tx)
+	return persons
+}
+
 func (s *service) Create(ctx context.Context, person entity.Person) (int, error) {
 	//TODO implement me
 	panic("implement me")
@@ -39,21 +53,7 @@ func (s *service) Update(ctx context.Context, person entity.Person) (int, error)
 	panic("implement me")
 }
 
-func (s *service) Delete(ctx context.Context, id int) (int, error) {
+func (s *service) Destroy(ctx context.Context, id int) (int, error) {
 	//TODO implement me
 	panic("implement me")
-}
-
-func (s service) FindById(ctx context.Context, id int) entity.Person {
-	tx, err := s.DB.Begin()
-	helper.Panic(err)
-	person := s.Repository.FindById(ctx, tx, id)
-	return person
-}
-
-func (s service) FindAll(ctx context.Context) []entity.Person {
-	tx, err := s.DB.Begin()
-	helper.Panic(err)
-	persons := s.Repository.FindAll(ctx, tx)
-	return persons
 }

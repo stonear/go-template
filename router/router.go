@@ -8,8 +8,8 @@ import (
 func New(c controller.Controller) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/api/persons", c.FindAll)
-	r.GET("/api/person/:id", c.FindById)
+	r.GET("/api/person", c.Index)
+	r.GET("/api/person/:id", c.Show)
 
 	return r
 }
