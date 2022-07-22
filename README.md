@@ -23,6 +23,18 @@ GET | /entities/:id | Show
 PUT | /entities/:id | Update
 DELETE | /entities/:id | Destroy
 
+## Commit Naming Rules
+A typical git commit message will look like: ```<type>: <subject>```, "type" must be one of the following mentioned below:
+- ```build```: Build related changes
+- ```chore```: A code change that external user won't see (eg: change to .gitignore file or .prettierrc file)
+- ```feat```: A new feature
+- ```fix```: A bug fix
+- ```docs```: Documentation related changes
+- ```refactor```: A code that neither fix bug nor adds a feature. (eg: You can use this when there is semantic changes like renaming a variable/ function name)
+- ```perf```: A code that improves performance
+- ```style```: A code that is related to styling
+- ```test```: Adding new test or making changes to existing test
+
 ## Testing
 
 If you are using VSCode, I recommend you to use [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) Extension for running ```apitest.http```.
