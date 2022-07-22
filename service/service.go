@@ -12,7 +12,7 @@ import (
 type Service interface {
 	Index(ctx context.Context) []entity.Person
 	Show(ctx context.Context, id int) entity.Person
-	Create(ctx context.Context, person entity.Person) (int, error)
+	Store(ctx context.Context, person entity.Person) (int, error)
 	Update(ctx context.Context, person entity.Person) (int, error)
 	Destroy(ctx context.Context, id int) (int, error)
 }
@@ -29,13 +29,6 @@ type service struct {
 	DB         *sql.DB
 }
 
-func (s service) Show(ctx context.Context, id int) entity.Person {
-	tx, err := s.DB.Begin()
-	helper.Panic(err)
-	person := s.Repository.Show(ctx, tx, id)
-	return person
-}
-
 func (s service) Index(ctx context.Context) []entity.Person {
 	tx, err := s.DB.Begin()
 	helper.Panic(err)
@@ -43,7 +36,14 @@ func (s service) Index(ctx context.Context) []entity.Person {
 	return persons
 }
 
-func (s *service) Create(ctx context.Context, person entity.Person) (int, error) {
+func (s service) Show(ctx context.Context, id int) entity.Person {
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	person := s.Repository.Show(ctx, tx, id)
+	return person
+}
+
+func (s *service) Store(ctx context.Context, person entity.Person) (int, error) {
 	//TODO implement me
 	panic("implement me")
 }

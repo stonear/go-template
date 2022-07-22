@@ -14,7 +14,7 @@ import (
 type Controller interface {
 	Index(ctx *gin.Context)
 	Show(ctx *gin.Context)
-	Create(ctx *gin.Context, person entity.Person)
+	Store(ctx *gin.Context, person entity.Person)
 	Update(ctx *gin.Context, person entity.Person)
 	Destroy(ctx *gin.Context, id int)
 }
@@ -29,6 +29,11 @@ type controller struct {
 	Service service.Service
 }
 
+func (c controller) Index(ctx *gin.Context) {
+	persons := c.Service.Index(ctx)
+	ctx.JSON(http.StatusOK, gin.H{"persons": persons})
+}
+
 func (c controller) Show(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	helper.Panic(err)
@@ -36,12 +41,7 @@ func (c controller) Show(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"person": person})
 }
 
-func (c controller) Index(ctx *gin.Context) {
-	persons := c.Service.Index(ctx)
-	ctx.JSON(http.StatusOK, gin.H{"persons": persons})
-}
-
-func (c *controller) Create(ctx *gin.Context, person entity.Person) {
+func (c *controller) Store(ctx *gin.Context, person entity.Person) {
 	//TODO implement me
 	panic("implement me")
 }

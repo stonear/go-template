@@ -23,5 +23,5 @@ go.work
 # Dotenv environment variables file
 .env
 
-# Others
+# IntelliJ's project specific settings files (GoLand)
 .idea/

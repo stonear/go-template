@@ -16,9 +16,13 @@ $ cd go-template
 Verb | URI | Action
 -----|-----|-------
 GET | /entities | Index
-GET | /entities/create | Create
+~~GET | /entities/create | Create~~ (Not implemented)
 POST | /entities | Store
 GET | /entities/:id | Show
-GET | /entities/:id/edit | Edit
+~~GET | /entities/:id/edit | Edit~~ (Not implemented)
 PUT | /entities/:id | Update
 DELETE | /entities/:id | Destroy
+
+## Testing
+
+If you are using VSCode, I recommend you to use [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) Extension for running ```apitest.http```.
