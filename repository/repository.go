@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/stonear/go-template/entity"
 	"github.com/stonear/go-template/helper"
@@ -51,8 +52,15 @@ func (r repository) Show(ctx context.Context, tx *sql.Tx, id int) entity.Person 
 }
 
 func (r *repository) Store(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	query := "INSERT INTO person (name) VALUES ($1) RETURNING id"
+	res, err := tx.ExecContext(ctx, query, person.Name)
+	if err != nil {
+		return -1, errors.New("fail to create person")
+	}
+
+	id, err := res.LastInsertId()
+	helper.Panic(err)
+	return int(id), err
 }
 
 func (r *repository) Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {

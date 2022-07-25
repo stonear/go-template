@@ -28,3 +28,18 @@ func New() *sql.DB {
 
 	return db
 }
+
+func Commit(tx *sql.Tx) {
+	if err := recover(); err != nil {
+		errRollback := tx.Rollback()
+		if errRollback != nil {
+			panic(errRollback)
+		}
+		panic(err)
+	} else {
+		errCommit := tx.Commit()
+		if errCommit != nil {
+			panic(errCommit)
+		}
+	}
+}

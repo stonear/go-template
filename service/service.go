@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"github.com/stonear/go-template/database"
 
 	"github.com/stonear/go-template/entity"
 	"github.com/stonear/go-template/helper"
@@ -32,6 +33,7 @@ type service struct {
 func (s service) Index(ctx context.Context) []entity.Person {
 	tx, err := s.DB.Begin()
 	helper.Panic(err)
+	defer database.Commit(tx)
 	persons := s.Repository.Index(ctx, tx)
 	return persons
 }
@@ -39,13 +41,17 @@ func (s service) Index(ctx context.Context) []entity.Person {
 func (s service) Show(ctx context.Context, id int) entity.Person {
 	tx, err := s.DB.Begin()
 	helper.Panic(err)
+	defer database.Commit(tx)
 	person := s.Repository.Show(ctx, tx, id)
 	return person
 }
 
 func (s *service) Store(ctx context.Context, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	defer database.Commit(tx)
+	id, err := s.Repository.Store(ctx, tx, person)
+	return id, err
 }
 
 func (s *service) Update(ctx context.Context, person entity.Person) (int, error) {
