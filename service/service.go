@@ -13,7 +13,7 @@ type Service interface {
 	Index(ctx context.Context) []entity.Person
 	Show(ctx context.Context, id int) entity.Person
 	Store(ctx context.Context, person entity.Person) (int, error)
-	Update(ctx context.Context, person entity.Person) (int, error)
+	Update(ctx context.Context, id int, person entity.Person) (entity.Person, error)
 	Destroy(ctx context.Context, id int) (int, error)
 }
 
@@ -56,9 +56,13 @@ func (s *service) Store(ctx context.Context, person entity.Person) (int, error) 
 	return id, err
 }
 
-func (s *service) Update(ctx context.Context, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *service) Update(ctx context.Context, id int, person entity.Person) (entity.Person, error) {
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	person, err = s.Repository.Update(ctx, tx, id, person)
+	helper.Panic(err)
+	err = tx.Commit()
+	return person, err
 }
 
 func (s *service) Destroy(ctx context.Context, id int) (int, error) {

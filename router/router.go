@@ -13,6 +13,8 @@ func New(c controller.Controller) *gin.Engine {
 		api.GET("/person", c.Index)
 		api.GET("/person/:id", c.Show)
 		api.POST("/person", c.Store)
+		api.PUT("/person/:id", c.Update)
+		api.DELETE("/person/:id", c.Destroy)
 	}
 
 	return r

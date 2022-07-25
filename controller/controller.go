@@ -15,8 +15,8 @@ type Controller interface {
 	Index(ctx *gin.Context)
 	Show(ctx *gin.Context)
 	Store(ctx *gin.Context)
-	Update(ctx *gin.Context, person entity.Person)
-	Destroy(ctx *gin.Context, id int)
+	Update(ctx *gin.Context)
+	Destroy(ctx *gin.Context)
 }
 
 func New(serv service.Service) Controller {
@@ -50,12 +50,18 @@ func (c *controller) Store(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
-func (c *controller) Update(ctx *gin.Context, person entity.Person) {
-	//TODO implement me
-	panic("implement me")
+func (c *controller) Update(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	helper.Panic(err)
+	person := entity.Person{}
+	err = ctx.ShouldBind(&person)
+	helper.Panic(err)
+	person, err = c.Service.Update(ctx, id, person)
+	helper.Panic(err)
+	ctx.JSON(http.StatusOK, gin.H{"person": person})
 }
 
-func (c *controller) Destroy(ctx *gin.Context, id int) {
-	//TODO implement me
-	panic("implement me")
+func (c *controller) Destroy(ctx *gin.Context) {
+	// id, err := strconv.Atoi(ctx.Param("id"))
+	// helper.Panic(err)
 }

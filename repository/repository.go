@@ -12,7 +12,7 @@ type Repository interface {
 	Index(ctx context.Context, tx *sql.Tx) []entity.Person
 	Show(ctx context.Context, tx *sql.Tx, id int) entity.Person
 	Store(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
-	Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
+	Update(ctx context.Context, tx *sql.Tx, id int, person entity.Person) (entity.Person, error)
 	Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error)
 }
 
@@ -59,9 +59,12 @@ func (r *repository) Store(ctx context.Context, tx *sql.Tx, person entity.Person
 	return id, err
 }
 
-func (r *repository) Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *repository) Update(ctx context.Context, tx *sql.Tx, id int, person entity.Person) (entity.Person, error) {
+	query := "UPDATE person SET name = $1 WHERE id = $2 RETURNING *"
+	row := tx.QueryRowContext(ctx, query, person.Name, id)
+	err := row.Scan(&person.ID, &person.Name)
+	helper.Panic(err)
+	return person, err
 }
 
 func (r *repository) Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error) {
