@@ -15,7 +15,7 @@ type Service interface {
 	Show(ctx context.Context, id int) entity.Person
 	Store(ctx context.Context, person entity.Person) (int, error)
 	Update(ctx context.Context, id int, person entity.Person) (entity.Person, error)
-	Destroy(ctx context.Context, id int) (int, error)
+	Destroy(ctx context.Context, id int) error
 }
 
 func New(repo repository.Repository, db *sql.DB) Service {
@@ -70,7 +70,11 @@ func (s *service) Update(ctx context.Context, id int, person entity.Person) (ent
 	return person, err
 }
 
-func (s *service) Destroy(ctx context.Context, id int) (int, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *service) Destroy(ctx context.Context, id int) error {
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	err = s.Repository.Destroy(ctx, tx, id)
+	helper.Panic(err)
+	err = tx.Commit()
+	return err
 }
