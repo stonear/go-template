@@ -33,6 +33,8 @@ func (s service) Index(ctx context.Context) []entity.Person {
 	tx, err := s.DB.Begin()
 	helper.Panic(err)
 	persons := s.Repository.Index(ctx, tx)
+	err = tx.Commit()
+	helper.Panic(err)
 	return persons
 }
 
@@ -40,6 +42,8 @@ func (s service) Show(ctx context.Context, id int) entity.Person {
 	tx, err := s.DB.Begin()
 	helper.Panic(err)
 	person := s.Repository.Show(ctx, tx, id)
+	err = tx.Commit()
+	helper.Panic(err)
 	return person
 }
 
@@ -47,6 +51,8 @@ func (s *service) Store(ctx context.Context, person entity.Person) (int, error) 
 	tx, err := s.DB.Begin()
 	helper.Panic(err)
 	id, err := s.Repository.Store(ctx, tx, person)
+	helper.Panic(err)
+	err = tx.Commit()
 	return id, err
 }
 
