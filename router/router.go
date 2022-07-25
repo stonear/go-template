@@ -8,9 +8,12 @@ import (
 func New(c controller.Controller) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/api/person", c.Index)
-	r.GET("/api/person/:id", c.Show)
-	r.POST("/api/person", c.Store)
+	api := r.Group("/v1")
+	{
+		api.GET("/person", c.Index)
+		api.GET("/person/:id", c.Show)
+		api.POST("/person", c.Store)
+	}
 
 	return r
 }
