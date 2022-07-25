@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"github.com/stonear/go-template/entity"
 	"github.com/stonear/go-template/helper"
@@ -13,7 +12,7 @@ type Repository interface {
 	Index(ctx context.Context, tx *sql.Tx) []entity.Person
 	Show(ctx context.Context, tx *sql.Tx, id int) entity.Person
 	Store(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
-	Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
+	Update(ctx context.Context, tx *sql.Tx, id int, person entity.Person) (entity.Person, error)
 	Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error)
 }
 
@@ -52,20 +51,20 @@ func (r repository) Show(ctx context.Context, tx *sql.Tx, id int) entity.Person 
 }
 
 func (r *repository) Store(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
-	query := "INSERT INTO person (name) VALUES ($1) RETURNING id"
-	res, err := tx.ExecContext(ctx, query, person.Name)
-	if err != nil {
-		return -1, errors.New("fail to create person")
-	}
-
-	id, err := res.LastInsertId()
+	var id int
+	query := "INSERT INTO person(name) VALUES ($1) RETURNING id"
+	row := tx.QueryRowContext(ctx, query, person.Name)
+	err := row.Scan(&id)
 	helper.Panic(err)
-	return int(id), err
+	return id, err
 }
 
-func (r *repository) Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *repository) Update(ctx context.Context, tx *sql.Tx, id int, person entity.Person) (entity.Person, error) {
+	query := "UPDATE person SET name = $1 WHERE id = $2 RETURNING *"
+	row := tx.QueryRowContext(ctx, query, person.Name, id)
+	err := row.Scan(&person.ID, &person.Name)
+	helper.Panic(err)
+	return person, err
 }
 
 func (r *repository) Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error) {
