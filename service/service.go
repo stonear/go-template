@@ -44,8 +44,10 @@ func (s service) Show(ctx context.Context, id int) entity.Person {
 }
 
 func (s *service) Store(ctx context.Context, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	tx, err := s.DB.Begin()
+	helper.Panic(err)
+	id, err := s.Repository.Store(ctx, tx, person)
+	return id, err
 }
 
 func (s *service) Update(ctx context.Context, person entity.Person) (int, error) {

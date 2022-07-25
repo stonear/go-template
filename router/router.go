@@ -10,6 +10,7 @@ func New(c controller.Controller) *gin.Engine {
 
 	r.GET("/api/person", c.Index)
 	r.GET("/api/person/:id", c.Show)
+	r.POST("/api/person", c.Store)
 
 	return r
 }

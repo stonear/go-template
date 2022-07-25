@@ -51,8 +51,12 @@ func (r repository) Show(ctx context.Context, tx *sql.Tx, id int) entity.Person 
 }
 
 func (r *repository) Store(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {
-	//TODO implement me
-	panic("implement me")
+	var id int
+	query := "INSERT INTO person(name) VALUES ($1) RETURNING id"
+	row := tx.QueryRowContext(ctx, query, person.Name)
+	err := row.Scan(&id)
+	helper.Panic(err)
+	return id, err
 }
 
 func (r *repository) Update(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error) {

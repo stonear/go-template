@@ -14,7 +14,7 @@ import (
 type Controller interface {
 	Index(ctx *gin.Context)
 	Show(ctx *gin.Context)
-	Store(ctx *gin.Context, person entity.Person)
+	Store(ctx *gin.Context)
 	Update(ctx *gin.Context, person entity.Person)
 	Destroy(ctx *gin.Context, id int)
 }
@@ -41,9 +41,13 @@ func (c controller) Show(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"person": person})
 }
 
-func (c *controller) Store(ctx *gin.Context, person entity.Person) {
-	//TODO implement me
-	panic("implement me")
+func (c *controller) Store(ctx *gin.Context) {
+	person := entity.Person{}
+	err := ctx.ShouldBind(&person)
+	helper.Panic(err)
+	id, err := c.Service.Store(ctx, person)
+	helper.Panic(err)
+	ctx.JSON(http.StatusCreated, gin.H{"id": id})
 }
 
 func (c *controller) Update(ctx *gin.Context, person entity.Person) {
