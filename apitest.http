@@ -20,3 +20,6 @@ Content-Type: application/json
 {
     "name": "New Name"
 }
+
+###
+DELETE http://localhost:8080/v1/person/6 HTTP/1.1
