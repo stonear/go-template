@@ -62,6 +62,9 @@ func (c *controller) Update(ctx *gin.Context) {
 }
 
 func (c *controller) Destroy(ctx *gin.Context) {
-	// id, err := strconv.Atoi(ctx.Param("id"))
-	// helper.Panic(err)
+	id, err := strconv.Atoi(ctx.Param("id"))
+	helper.Panic(err)
+	err = c.Service.Destroy(ctx, id)
+	helper.Panic(err)
+	ctx.Writer.WriteHeader(http.StatusOK)
 }

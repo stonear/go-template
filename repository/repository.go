@@ -13,7 +13,7 @@ type Repository interface {
 	Show(ctx context.Context, tx *sql.Tx, id int) entity.Person
 	Store(ctx context.Context, tx *sql.Tx, person entity.Person) (int, error)
 	Update(ctx context.Context, tx *sql.Tx, id int, person entity.Person) (entity.Person, error)
-	Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error)
+	Destroy(ctx context.Context, tx *sql.Tx, id int) error
 }
 
 func New() Repository {
@@ -67,7 +67,9 @@ func (r *repository) Update(ctx context.Context, tx *sql.Tx, id int, person enti
 	return person, err
 }
 
-func (r *repository) Destroy(ctx context.Context, tx *sql.Tx, id int) (int, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *repository) Destroy(ctx context.Context, tx *sql.Tx, id int) error {
+	query := "DELETE FROM person WHERE id = $1"
+	_, err := tx.ExecContext(ctx, query, id)
+	helper.Panic(err)
+	return err
 }
