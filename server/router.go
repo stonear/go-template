@@ -8,6 +8,7 @@ import (
 func Router(
 	r *gin.Engine,
 	personSvc service.PersonService,
+	pokemonSvc service.PokemonService,
 ) {
 	api := r.Group("/v1")
 	{
@@ -16,5 +17,7 @@ func Router(
 		api.POST("/person", personSvc.Store)
 		api.PUT("/person/:id", personSvc.Update)
 		api.DELETE("/person/:id", personSvc.Destroy)
+
+		api.GET("/pokemon", pokemonSvc.Index)
 	}
 }

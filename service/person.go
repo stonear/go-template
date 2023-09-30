@@ -56,11 +56,11 @@ func (s *personService) Index(ctx *gin.Context) {
 }
 
 func (s *personService) Show(ctx *gin.Context) {
-	type ShowRequest struct {
+	type ShowUri struct {
 		Id int `uri:"id" binding:"required,gt=0"`
 	}
-	var req ShowRequest
-	err := ctx.ShouldBindUri(&req)
+	var uri ShowUri
+	err := ctx.ShouldBindUri(&uri)
 	if err != nil {
 		s.log.Error("failed to bind request", zap.Error(err))
 		ctx.JSON(http.StatusBadRequest, response.New(
@@ -69,11 +69,11 @@ func (s *personService) Show(ctx *gin.Context) {
 		))
 		return
 	}
-	person, err := s.personDb.Show(ctx, s.pool, int64(req.Id))
+	person, err := s.personDb.Show(ctx, s.pool, int64(uri.Id))
 	if err != nil {
 		s.log.Error(
 			"failed to get personDb.Show",
-			zap.Int("Id", req.Id),
+			zap.Int("Id", uri.Id),
 			zap.Error(err),
 		)
 		if err == pgx.ErrNoRows {
@@ -135,15 +135,82 @@ func (s *personService) Store(ctx *gin.Context) {
 }
 
 func (s *personService) Update(ctx *gin.Context) {
-	// TODO: implement this
+	type UpdateUri struct {
+		Id int `uri:"id" binding:"required,gt=0"`
+	}
+	var uri UpdateUri
+	err := ctx.ShouldBindUri(&uri)
+	if err != nil {
+		s.log.Error("failed to bind request", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, response.New(
+			response.CodeInvalidFormat,
+			validator.Message(err),
+		))
+		return
+	}
+	type UpdateRequest struct {
+		Name string `form:"name" binding:"required,notEvil"`
+	}
+	var req UpdateRequest
+	err = ctx.ShouldBindWith(&req, binding.JSON)
+	if err != nil {
+		s.log.Error("failed to bind request", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, response.New(
+			response.CodeInvalidFormat,
+			validator.Message(err),
+		))
+		return
+	}
+	person, err := s.personDb.Update(ctx, s.pool, person.UpdateParams{
+		ID:   int64(uri.Id),
+		Name: req.Name,
+	})
+	if err != nil {
+		s.log.Error(
+			"failed to call personDb.Update",
+			zap.Int("Id", uri.Id),
+			zap.String("Name", req.Name),
+			zap.Error(err),
+		)
+		ctx.JSON(http.StatusInternalServerError, response.New(
+			response.CodeGeneralError,
+			nil,
+		))
+		return
+	}
 	ctx.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
-		nil,
+		person,
 	))
 }
 
 func (s *personService) Destroy(ctx *gin.Context) {
-	// TODO: implement this
+	type DestroyUri struct {
+		Id int `uri:"id" binding:"required,gt=0"`
+	}
+	var uri DestroyUri
+	err := ctx.ShouldBindUri(&uri)
+	if err != nil {
+		s.log.Error("failed to bind request", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, response.New(
+			response.CodeInvalidFormat,
+			validator.Message(err),
+		))
+		return
+	}
+	err = s.personDb.Destroy(ctx, s.pool, int64(uri.Id))
+	if err != nil {
+		s.log.Error(
+			"failed to call personDb.Destroy",
+			zap.Int("Id", uri.Id),
+			zap.Error(err),
+		)
+		ctx.JSON(http.StatusInternalServerError, response.New(
+			response.CodeGeneralError,
+			nil,
+		))
+		return
+	}
 	ctx.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
 		nil,

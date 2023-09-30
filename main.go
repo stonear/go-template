@@ -3,8 +3,10 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stonear/go-template/client/pokemon"
 	"github.com/stonear/go-template/config"
 	"github.com/stonear/go-template/db/person"
+	"github.com/stonear/go-template/library/httpclient"
 	"github.com/stonear/go-template/library/postgres"
 	"github.com/stonear/go-template/logger"
 	"github.com/stonear/go-template/server"
@@ -25,8 +27,14 @@ func main() {
 		fx.Provide(
 			logger.New,
 			postgres.New,
+			httpclient.New,
+
 			person.New,
+			pokemon.New,
+
 			service.NewPersonService,
+			service.NewPokemonService,
+
 			server.New,
 		),
 		fx.Invoke(
