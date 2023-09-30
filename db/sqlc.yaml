@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "query.sql"
+    schema: "../db/migrations"
+    gen:
+      go:
+        package: "person"
+        sql_package: "pgx/v5"
+        emit_methods_with_db_argument: true
+        out: "person"

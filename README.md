@@ -11,6 +11,39 @@ $ git clone https://github.com/stonear/go-template
 $ cd go-template
 ```
 
+## Running Template
+
+```
+$ // create .env file
+$ make dep
+$ go run .
+```
+
+## Create Migration
+
+```
+$ dbmate n <your-migration-name>
+$ dbmate migrate
+```
+
+## Rollback Migration
+
+```
+$ dbmate down
+```
+
+## Generate SQLC
+
+```
+$ make gen
+```
+
+## Lint
+
+```
+$ make lint
+```
+
 ## REST Resource Naming Guide
 
 Verb | URI | Action
@@ -37,10 +70,9 @@ A typical git commit message will look like: ```<type>: <subject>```, "type" mus
 
 ## Testing
 
-If you are using VSCode, I recommend you to use [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) Extension for running ```apitest.http```.
 
-To check if the database connected successfully, you can run the following command:
-
-```go test -timeout 30s -run ^TestDb$ github.com/stonear/go-template/database```
+```
+$ make test
+```
 
 Files with the suffix ```_test.go``` are only compiled and run by the ```go test``` tool.
