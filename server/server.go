@@ -35,13 +35,13 @@ func New(lc fx.Lifecycle, log *zap.Logger) *gin.Engine {
 		OnStart: func(ctx context.Context) error {
 			ln, err := net.Listen("tcp", srv.Addr)
 			if err != nil {
-				log.Info("[Server] Failed to listen tcp at", zap.String("addr", srv.Addr))
+				log.Error("[Server] Failed to listen tcp at", zap.String("addr", srv.Addr))
 				return err
 			}
 			go func() {
 				err := srv.Serve(ln)
 				if err != nil {
-					log.Info("[Server] Failed to start HTTP Server at", zap.String("addr", srv.Addr))
+					log.Error("[Server] Failed to start HTTP Server at", zap.String("addr", srv.Addr))
 				}
 				log.Info("[Server] Succeeded to start HTTP Server at", zap.String("addr", srv.Addr))
 			}()
@@ -51,7 +51,7 @@ func New(lc fx.Lifecycle, log *zap.Logger) *gin.Engine {
 		OnStop: func(ctx context.Context) error {
 			err := srv.Shutdown(ctx)
 			if err != nil {
-				log.Info("[Server] Failed to stop HTTP Server")
+				log.Error("[Server] Failed to stop HTTP Server")
 			}
 			log.Info("[Server] HTTP Server is stopped")
 			return nil
