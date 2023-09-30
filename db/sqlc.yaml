@@ -1,7 +1,7 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "query.sql"
+    queries: "person.sql"
     schema: "../db/migrations"
     gen:
       go:
@@ -9,3 +9,15 @@ sql:
         sql_package: "pgx/v5"
         emit_methods_with_db_argument: true
         out: "person"
+
+  # add below if you want to generate another package
+
+  # - engine: "postgresql"
+  #   queries: "job.sql"
+  #   schema: "../db/migrations"
+  #   gen:
+  #     go:
+  #       package: "job"
+  #       sql_package: "pgx/v5"
+  #       emit_methods_with_db_argument: true
+  #       out: "job"
