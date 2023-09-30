@@ -1,39 +1,40 @@
 package main
 
 import (
-	"database/sql"
-	"net/http"
-	"os"
-
-	"github.com/joho/godotenv"
-	"github.com/stonear/go-template/controller"
-	"github.com/stonear/go-template/database"
-	"github.com/stonear/go-template/helper"
-	"github.com/stonear/go-template/repository"
-	"github.com/stonear/go-template/router"
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/stonear/go-template/config"
+	"github.com/stonear/go-template/db/person"
+	"github.com/stonear/go-template/library/postgres"
+	"github.com/stonear/go-template/logger"
+	"github.com/stonear/go-template/server"
 	"github.com/stonear/go-template/service"
+	"github.com/stonear/go-template/validator"
+	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
+	"go.uber.org/zap"
 )
 
 func main() {
-	err := godotenv.Load()
-	helper.Panic(err)
-
-	db := database.New()
-	defer func(db *sql.DB) {
-		err := db.Close()
-		helper.Panic(err)
-	}(db)
-
-	personRepository := repository.New()
-	personService := service.New(personRepository, db)
-	personController := controller.New(personService)
-
-	r := router.New(personController)
-	server := http.Server{
-		Addr:    os.Getenv("APP_URL"),
-		Handler: r,
-	}
-
-	err = server.ListenAndServe()
-	helper.Panic(err)
+	fx.New(
+		fx.WithLogger(func(log *zap.Logger) fxevent.Logger {
+			return &fxevent.ZapLogger{
+				Logger: log,
+			}
+		}),
+		fx.Provide(
+			logger.New,
+			postgres.New,
+			person.New,
+			service.NewPersonService,
+			server.New,
+		),
+		fx.Invoke(
+			config.Load,
+			validator.Load,
+			func(*pgxpool.Pool) {},
+			server.Router,
+			func(*gin.Engine) {},
+		),
+	).Run()
 }
