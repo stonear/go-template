@@ -13,6 +13,7 @@ func Router(
 	api := r.Group("/v1")
 	{
 		api.GET("/person", personSvc.Index)
+		api.GET("/person/report", personSvc.Report)
 		api.GET("/person/:id", personSvc.Show)
 		api.POST("/person", personSvc.Store)
 		api.PUT("/person/:id", personSvc.Update)

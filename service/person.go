@@ -1,12 +1,16 @@
 package service
 
 import (
+	"bytes"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/signintech/gopdf"
+	"github.com/signintech/pdft"
 	"github.com/stonear/go-template/db/person"
 	"github.com/stonear/go-template/response"
 	"github.com/stonear/go-template/validator"
@@ -19,6 +23,7 @@ type PersonService interface {
 	Store(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Destroy(ctx *gin.Context)
+	Report(ctx *gin.Context)
 }
 
 func NewPersonService(
@@ -215,4 +220,86 @@ func (s *personService) Destroy(ctx *gin.Context) {
 		response.CodeSuccess,
 		nil,
 	))
+}
+
+func (s *personService) Report(ctx *gin.Context) {
+	persons, err := s.personDb.Index(ctx, s.pool)
+	if err != nil {
+		s.log.Error("failed to get personDb.Index", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, response.New(
+			response.CodeGeneralError,
+			nil,
+		))
+		return
+	}
+
+	var pt pdft.PDFt
+	err = pt.Open("template/blank.pdf")
+	if err != nil {
+		s.log.Error("failed to load pdf template", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, response.New(
+			response.CodeGeneralError,
+			nil,
+		))
+		return
+	}
+
+	err = pt.AddFont("roboto", "template/Roboto-Regular.ttf")
+	if err != nil {
+		s.log.Error("failed to load font", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, response.New(
+			response.CodeGeneralError,
+			nil,
+		))
+		return
+	}
+
+	err = pt.SetFont("roboto", "", 14)
+	if err != nil {
+		s.log.Error("failed to set font", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, response.New(
+			response.CodeGeneralError,
+			nil,
+		))
+		return
+	}
+
+	x := float64(10)
+	y := float64(10)
+	for _, person := range persons {
+		err = pt.Insert(strconv.Itoa(int(person.ID)), 1, x, y, 100, 14, gopdf.Left|gopdf.Bottom)
+		if err != nil {
+			s.log.Error("failed to insert text", zap.Error(err))
+			ctx.JSON(http.StatusInternalServerError, response.New(
+				response.CodeGeneralError,
+				nil,
+			))
+			return
+		}
+
+		err = pt.Insert(person.Name, 1, x+12, y, 100, 14, gopdf.Left|gopdf.Bottom)
+		if err != nil {
+			s.log.Error("failed to insert text", zap.Error(err))
+			ctx.JSON(http.StatusInternalServerError, response.New(
+				response.CodeGeneralError,
+				nil,
+			))
+			return
+		}
+
+		y += 18
+	}
+
+	var buffer bytes.Buffer
+	err = pt.SaveTo(&buffer)
+	if err != nil {
+		s.log.Error("failed to save pdf", zap.Error(err))
+		ctx.JSON(http.StatusInternalServerError, response.New(
+			response.CodeGeneralError,
+			nil,
+		))
+		return
+	}
+
+	ctx.Data(http.StatusOK, "application/pdf", buffer.Bytes())
 }
