@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-contrib/gzip"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-contrib/secure"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,8 @@ func New(lc fx.Lifecycle, log *zap.Logger) *gin.Engine {
 	securityConfig := secure.DefaultConfig()
 	securityConfig.SSLRedirect = false
 	handler.Use(secure.New(securityConfig))
+
+	pprof.Register(handler)
 
 	srv := &http.Server{
 		Addr:    ":8080",

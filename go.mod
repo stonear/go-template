@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/ernesto-jimenez/httplogger v0.0.0-20220128121225-117514c3f345
 	github.com/gin-contrib/gzip v0.0.6
+	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-contrib/secure v0.0.1
 	github.com/gin-contrib/zap v0.2.0
 	github.com/gin-gonic/gin v1.9.1
