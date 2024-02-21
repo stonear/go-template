@@ -1,17 +1,18 @@
 package pokemon
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/stonear/go-template/library/httpclient"
-	"go.uber.org/zap"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 )
 
 type Pokemon interface {
-	GetPokemon() (*PokemonList, error)
+	GetPokemon(ctx context.Context) (*PokemonList, error)
 }
 
-func New(log *zap.Logger, client httpclient.Helper) Pokemon {
+func New(log *otelzap.Logger, client httpclient.Helper) Pokemon {
 	return &pokemon{
 		log:    log,
 		client: client,
@@ -21,16 +22,16 @@ func New(log *zap.Logger, client httpclient.Helper) Pokemon {
 }
 
 type pokemon struct {
-	log     *zap.Logger
+	log     *otelzap.Logger
 	client  httpclient.Helper
 	baseUrl string
 }
 
-func (c *pokemon) GetPokemon() (*PokemonList, error) {
+func (c *pokemon) GetPokemon(ctx context.Context) (*PokemonList, error) {
 	resp := new(PokemonList)
 	fullPath := c.client.JoinPath(c.baseUrl, "pokemon")
 
-	httpReq, err := http.NewRequest(http.MethodGet, fullPath, c.client.AnyToBuffer(nil))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, fullPath, c.client.AnyToBuffer(nil))
 	if err != nil {
 		return nil, c.client.ErrorParseHTTPRequest(httpReq, err)
 	}

@@ -3,11 +3,12 @@ package logger
 import (
 	"os"
 
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func New() *zap.Logger {
+func New() *otelzap.Logger {
 	infoLevel := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
 		return level == zapcore.InfoLevel || level == zapcore.WarnLevel
 	})
@@ -35,5 +36,5 @@ func New() *zap.Logger {
 		),
 	)
 
-	return zap.New(core)
+	return otelzap.New(zap.New(core))
 }

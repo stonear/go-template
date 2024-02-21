@@ -5,14 +5,16 @@ import (
 	"os"
 	"time"
 
+	"github.com/exaring/otelpgx"
 	pgxZap "github.com/jackc/pgx-zap"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
 
-func New(lc fx.Lifecycle, log *zap.Logger) *pgxpool.Pool {
+func New(lc fx.Lifecycle, log *otelzap.Logger) *pgxpool.Pool {
 	ctx := context.Background()
 
 	envHost := os.Getenv("DB_HOST")
@@ -34,10 +36,15 @@ func New(lc fx.Lifecycle, log *zap.Logger) *pgxpool.Pool {
 	config.HealthCheckPeriod = time.Minute
 	config.ConnConfig.ConnectTimeout = time.Second * 10
 	config.ConnConfig.RuntimeParams["timezone"] = os.Getenv("DB_TZ")
-	config.ConnConfig.Tracer = &tracelog.TraceLog{
-		Logger:   pgxZap.NewLogger(log),
-		LogLevel: tracelog.LogLevelTrace,
-	}
+	config.ConnConfig.Tracer = NewTracer(
+		// zap
+		&tracelog.TraceLog{
+			Logger:   pgxZap.NewLogger(log.Logger),
+			LogLevel: tracelog.LogLevelTrace,
+		},
+		// opentelemetry
+		otelpgx.NewTracer(),
+	)
 
 	conn, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {

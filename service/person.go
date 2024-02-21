@@ -14,20 +14,21 @@ import (
 	"github.com/stonear/go-template/db/person"
 	"github.com/stonear/go-template/response"
 	"github.com/stonear/go-template/validator"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 )
 
 type PersonService interface {
-	Index(ctx *gin.Context)
-	Show(ctx *gin.Context)
-	Store(ctx *gin.Context)
-	Update(ctx *gin.Context)
-	Destroy(ctx *gin.Context)
-	Report(ctx *gin.Context)
+	Index(c *gin.Context)
+	Show(c *gin.Context)
+	Store(c *gin.Context)
+	Update(c *gin.Context)
+	Destroy(c *gin.Context)
+	Report(c *gin.Context)
 }
 
 func NewPersonService(
-	log *zap.Logger,
+	log *otelzap.Logger,
 	pool *pgxpool.Pool,
 	personDb *person.Queries,
 ) PersonService {
@@ -39,36 +40,38 @@ func NewPersonService(
 }
 
 type personService struct {
-	log      *zap.Logger
+	log      *otelzap.Logger
 	pool     *pgxpool.Pool
 	personDb *person.Queries
 }
 
-func (s *personService) Index(ctx *gin.Context) {
+func (s *personService) Index(c *gin.Context) {
+	ctx := c.Request.Context()
 	persons, err := s.personDb.Index(ctx, s.pool)
 	if err != nil {
-		s.log.Error("failed to get personDb.Index", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		s.log.Ctx(ctx).Error("failed to get personDb.Index", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
 		return
 	}
-	ctx.JSON(http.StatusOK, response.New(
+	c.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
 		persons,
 	))
 }
 
-func (s *personService) Show(ctx *gin.Context) {
+func (s *personService) Show(c *gin.Context) {
+	ctx := c.Request.Context()
 	type ShowUri struct {
 		Id int `uri:"id" binding:"required,gt=0"`
 	}
 	var uri ShowUri
-	err := ctx.ShouldBindUri(&uri)
+	err := c.ShouldBindUri(&uri)
 	if err != nil {
-		s.log.Error("failed to bind request", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, response.New(
+		s.log.Ctx(ctx).Error("failed to bind request", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
 			response.CodeInvalidFormat,
 			validator.Message(err),
 		))
@@ -76,39 +79,40 @@ func (s *personService) Show(ctx *gin.Context) {
 	}
 	person, err := s.personDb.Show(ctx, s.pool, int64(uri.Id))
 	if err != nil {
-		s.log.Error(
+		s.log.Ctx(ctx).Error(
 			"failed to get personDb.Show",
 			zap.Int("Id", uri.Id),
 			zap.Error(err),
 		)
 		if err == pgx.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, response.New(
+			c.JSON(http.StatusNotFound, response.New(
 				response.CodeNotFound,
 				nil,
 			))
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
 		return
 	}
-	ctx.JSON(http.StatusOK, response.New(
+	c.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
 		person,
 	))
 }
 
-func (s *personService) Store(ctx *gin.Context) {
+func (s *personService) Store(c *gin.Context) {
+	ctx := c.Request.Context()
 	type StoreRequest struct {
 		Name string `form:"name" binding:"required,notEvil"`
 	}
 	var req StoreRequest
-	err := ctx.ShouldBindWith(&req, binding.JSON)
+	err := c.ShouldBindWith(&req, binding.JSON)
 	if err != nil {
-		s.log.Error("failed to bind request", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, response.New(
+		s.log.Ctx(ctx).Error("failed to bind request", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
 			response.CodeInvalidFormat,
 			validator.Message(err),
 		))
@@ -116,12 +120,12 @@ func (s *personService) Store(ctx *gin.Context) {
 	}
 	person, err := s.personDb.Store(ctx, s.pool, req.Name)
 	if err != nil {
-		s.log.Error(
+		s.log.Ctx(ctx).Error(
 			"failed to call personDb.Store",
 			zap.String("Name", req.Name),
 			zap.Error(err),
 		)
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
@@ -133,21 +137,22 @@ func (s *personService) Store(ctx *gin.Context) {
 	var resp = StoreResponse{
 		Id: int(person.ID),
 	}
-	ctx.JSON(http.StatusOK, response.New(
+	c.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
 		resp,
 	))
 }
 
-func (s *personService) Update(ctx *gin.Context) {
+func (s *personService) Update(c *gin.Context) {
+	ctx := c.Request.Context()
 	type UpdateUri struct {
 		Id int `uri:"id" binding:"required,gt=0"`
 	}
 	var uri UpdateUri
-	err := ctx.ShouldBindUri(&uri)
+	err := c.ShouldBindUri(&uri)
 	if err != nil {
-		s.log.Error("failed to bind request", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, response.New(
+		s.log.Ctx(ctx).Error("failed to bind request", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
 			response.CodeInvalidFormat,
 			validator.Message(err),
 		))
@@ -157,10 +162,10 @@ func (s *personService) Update(ctx *gin.Context) {
 		Name string `form:"name" binding:"required,notEvil"`
 	}
 	var req UpdateRequest
-	err = ctx.ShouldBindWith(&req, binding.JSON)
+	err = c.ShouldBindWith(&req, binding.JSON)
 	if err != nil {
-		s.log.Error("failed to bind request", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, response.New(
+		s.log.Ctx(ctx).Error("failed to bind request", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
 			response.CodeInvalidFormat,
 			validator.Message(err),
 		))
@@ -171,33 +176,34 @@ func (s *personService) Update(ctx *gin.Context) {
 		Name: req.Name,
 	})
 	if err != nil {
-		s.log.Error(
+		s.log.Ctx(ctx).Error(
 			"failed to call personDb.Update",
 			zap.Int("Id", uri.Id),
 			zap.String("Name", req.Name),
 			zap.Error(err),
 		)
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
 		return
 	}
-	ctx.JSON(http.StatusOK, response.New(
+	c.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
 		person,
 	))
 }
 
-func (s *personService) Destroy(ctx *gin.Context) {
+func (s *personService) Destroy(c *gin.Context) {
+	ctx := c.Request.Context()
 	type DestroyUri struct {
 		Id int `uri:"id" binding:"required,gt=0"`
 	}
 	var uri DestroyUri
-	err := ctx.ShouldBindUri(&uri)
+	err := c.ShouldBindUri(&uri)
 	if err != nil {
-		s.log.Error("failed to bind request", zap.Error(err))
-		ctx.JSON(http.StatusBadRequest, response.New(
+		s.log.Ctx(ctx).Error("failed to bind request", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
 			response.CodeInvalidFormat,
 			validator.Message(err),
 		))
@@ -205,28 +211,29 @@ func (s *personService) Destroy(ctx *gin.Context) {
 	}
 	err = s.personDb.Destroy(ctx, s.pool, int64(uri.Id))
 	if err != nil {
-		s.log.Error(
+		s.log.Ctx(ctx).Error(
 			"failed to call personDb.Destroy",
 			zap.Int("Id", uri.Id),
 			zap.Error(err),
 		)
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
 		return
 	}
-	ctx.JSON(http.StatusOK, response.New(
+	c.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
 		nil,
 	))
 }
 
-func (s *personService) Report(ctx *gin.Context) {
+func (s *personService) Report(c *gin.Context) {
+	ctx := c.Request.Context()
 	persons, err := s.personDb.Index(ctx, s.pool)
 	if err != nil {
-		s.log.Error("failed to get personDb.Index", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		s.log.Ctx(ctx).Error("failed to get personDb.Index", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
@@ -236,8 +243,8 @@ func (s *personService) Report(ctx *gin.Context) {
 	var pt pdft.PDFt
 	err = pt.Open("template/blank.pdf")
 	if err != nil {
-		s.log.Error("failed to load pdf template", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		s.log.Ctx(ctx).Error("failed to load pdf template", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
@@ -246,8 +253,8 @@ func (s *personService) Report(ctx *gin.Context) {
 
 	err = pt.AddFont("roboto", "template/Roboto-Regular.ttf")
 	if err != nil {
-		s.log.Error("failed to load font", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		s.log.Ctx(ctx).Error("failed to load font", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
@@ -256,8 +263,8 @@ func (s *personService) Report(ctx *gin.Context) {
 
 	err = pt.SetFont("roboto", "", 14)
 	if err != nil {
-		s.log.Error("failed to set font", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		s.log.Ctx(ctx).Error("failed to set font", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
@@ -269,8 +276,8 @@ func (s *personService) Report(ctx *gin.Context) {
 	for _, person := range persons {
 		err = pt.Insert(strconv.Itoa(int(person.ID)), 1, x, y, 100, 14, gopdf.Left|gopdf.Bottom)
 		if err != nil {
-			s.log.Error("failed to insert text", zap.Error(err))
-			ctx.JSON(http.StatusInternalServerError, response.New(
+			s.log.Ctx(ctx).Error("failed to insert text", zap.Error(err))
+			c.JSON(http.StatusInternalServerError, response.New(
 				response.CodeGeneralError,
 				nil,
 			))
@@ -279,8 +286,8 @@ func (s *personService) Report(ctx *gin.Context) {
 
 		err = pt.Insert(person.Name, 1, x+12, y, 100, 14, gopdf.Left|gopdf.Bottom)
 		if err != nil {
-			s.log.Error("failed to insert text", zap.Error(err))
-			ctx.JSON(http.StatusInternalServerError, response.New(
+			s.log.Ctx(ctx).Error("failed to insert text", zap.Error(err))
+			c.JSON(http.StatusInternalServerError, response.New(
 				response.CodeGeneralError,
 				nil,
 			))
@@ -293,13 +300,13 @@ func (s *personService) Report(ctx *gin.Context) {
 	var buffer bytes.Buffer
 	err = pt.SaveTo(&buffer)
 	if err != nil {
-		s.log.Error("failed to save pdf", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, response.New(
+		s.log.Ctx(ctx).Error("failed to save pdf", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, response.New(
 			response.CodeGeneralError,
 			nil,
 		))
 		return
 	}
 
-	ctx.Data(http.StatusOK, "application/pdf", buffer.Bytes())
+	c.Data(http.StatusOK, "application/pdf", buffer.Bytes())
 }

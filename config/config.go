@@ -2,10 +2,10 @@ package config
 
 import (
 	"github.com/joho/godotenv"
-	"go.uber.org/zap"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 )
 
-func Load(log *zap.Logger) {
+func Load(log *otelzap.Logger) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

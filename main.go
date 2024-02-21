@@ -11,17 +11,18 @@ import (
 	"github.com/stonear/go-template/logger"
 	"github.com/stonear/go-template/server"
 	"github.com/stonear/go-template/service"
+	"github.com/stonear/go-template/tracer"
 	"github.com/stonear/go-template/validator"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
-	"go.uber.org/zap"
 )
 
 func main() {
 	fx.New(
-		fx.WithLogger(func(log *zap.Logger) fxevent.Logger {
+		fx.WithLogger(func(log *otelzap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{
-				Logger: log,
+				Logger: log.Logger,
 			}
 		}),
 		fx.Provide(
@@ -40,6 +41,7 @@ func main() {
 		fx.Invoke(
 			config.Load,
 			validator.Load,
+			tracer.Load,
 			func(*pgxpool.Pool) {},
 			server.Router,
 			func(*gin.Engine) {},

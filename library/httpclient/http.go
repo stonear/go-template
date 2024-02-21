@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/ernesto-jimenez/httplogger"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 )
 
@@ -21,19 +23,21 @@ type Helper interface {
 	AnyToBuffer(v any) *bytes.Buffer
 }
 
-func New(log *zap.Logger) Helper {
-	transport := &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}).DialContext,
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-	}
+func New(log *otelzap.Logger) Helper {
+	transport := otelhttp.NewTransport(
+		&http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			ForceAttemptHTTP2:     true,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+		},
+	)
 
 	return &helper{
 		log: log,
@@ -50,7 +54,7 @@ func New(log *zap.Logger) Helper {
 }
 
 type helper struct {
-	log    *zap.Logger
+	log    *otelzap.Logger
 	client *http.Client
 }
 

@@ -5,11 +5,12 @@ import (
 	"net/http/httputil"
 	"time"
 
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 )
 
 type httpLogger struct {
-	log *zap.Logger
+	log *otelzap.Logger
 }
 
 func (l *httpLogger) LogRequest(req *http.Request) {

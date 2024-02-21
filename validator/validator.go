@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"go.uber.org/zap"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 )
 
-func Load(log *zap.Logger) {
+func Load(log *otelzap.Logger) {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		err := v.RegisterValidation("notEvil", notEvil)
 		if err != nil {
