@@ -5,11 +5,12 @@
 package person
 
 import (
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Person struct {
-	ID        int64
+	ID        uuid.UUID
 	Name      string
 	CreatedAt pgtype.Timestamptz
 	UpdatedAt pgtype.Timestamptz

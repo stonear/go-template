@@ -9,6 +9,11 @@ sql:
         sql_package: "pgx/v5"
         emit_methods_with_db_argument: true
         out: "person"
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
 
   # add below if you want to generate another package
 
@@ -21,3 +26,8 @@ sql:
   #       sql_package: "pgx/v5"
   #       emit_methods_with_db_argument: true
   #       out: "job"
+  #       overrides:
+  #         - db_type: "uuid"
+  #           go_type:
+  #             import: "github.com/google/uuid"
+  #             type: "UUID"

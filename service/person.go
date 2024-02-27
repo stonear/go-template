@@ -3,10 +3,10 @@ package service
 import (
 	"bytes"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/signintech/gopdf"
@@ -65,7 +65,7 @@ func (s *personService) Index(c *gin.Context) {
 func (s *personService) Show(c *gin.Context) {
 	ctx := c.Request.Context()
 	type ShowUri struct {
-		Id int `uri:"id" binding:"required,gt=0"`
+		Id string `uri:"id" binding:"required,gt=0"`
 	}
 	var uri ShowUri
 	err := c.ShouldBindUri(&uri)
@@ -77,11 +77,20 @@ func (s *personService) Show(c *gin.Context) {
 		))
 		return
 	}
-	person, err := s.personDb.Show(ctx, s.pool, int64(uri.Id))
+	id, err := uuid.Parse(uri.Id)
+	if err != nil {
+		s.log.Ctx(ctx).Error("failed to parse uuid", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
+			response.CodeInvalidFormat,
+			validator.Message(err),
+		))
+		return
+	}
+	person, err := s.personDb.Show(ctx, s.pool, id)
 	if err != nil {
 		s.log.Ctx(ctx).Error(
 			"failed to get personDb.Show",
-			zap.Int("Id", uri.Id),
+			zap.String("Id", uri.Id),
 			zap.Error(err),
 		)
 		if err == pgx.ErrNoRows {
@@ -132,10 +141,10 @@ func (s *personService) Store(c *gin.Context) {
 		return
 	}
 	type StoreResponse struct {
-		Id int `json:"id"`
+		Id string `json:"id"`
 	}
 	var resp = StoreResponse{
-		Id: int(person.ID),
+		Id: person.ID.String(),
 	}
 	c.JSON(http.StatusOK, response.New(
 		response.CodeSuccess,
@@ -146,7 +155,7 @@ func (s *personService) Store(c *gin.Context) {
 func (s *personService) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	type UpdateUri struct {
-		Id int `uri:"id" binding:"required,gt=0"`
+		Id string `uri:"id" binding:"required,gt=0"`
 	}
 	var uri UpdateUri
 	err := c.ShouldBindUri(&uri)
@@ -171,14 +180,23 @@ func (s *personService) Update(c *gin.Context) {
 		))
 		return
 	}
+	id, err := uuid.Parse(uri.Id)
+	if err != nil {
+		s.log.Ctx(ctx).Error("failed to parse uuid", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
+			response.CodeInvalidFormat,
+			validator.Message(err),
+		))
+		return
+	}
 	person, err := s.personDb.Update(ctx, s.pool, person.UpdateParams{
-		ID:   int64(uri.Id),
+		ID:   id,
 		Name: req.Name,
 	})
 	if err != nil {
 		s.log.Ctx(ctx).Error(
 			"failed to call personDb.Update",
-			zap.Int("Id", uri.Id),
+			zap.String("Id", uri.Id),
 			zap.String("Name", req.Name),
 			zap.Error(err),
 		)
@@ -197,7 +215,7 @@ func (s *personService) Update(c *gin.Context) {
 func (s *personService) Destroy(c *gin.Context) {
 	ctx := c.Request.Context()
 	type DestroyUri struct {
-		Id int `uri:"id" binding:"required,gt=0"`
+		Id string `uri:"id" binding:"required,gt=0"`
 	}
 	var uri DestroyUri
 	err := c.ShouldBindUri(&uri)
@@ -209,11 +227,20 @@ func (s *personService) Destroy(c *gin.Context) {
 		))
 		return
 	}
-	err = s.personDb.Destroy(ctx, s.pool, int64(uri.Id))
+	id, err := uuid.Parse(uri.Id)
+	if err != nil {
+		s.log.Ctx(ctx).Error("failed to parse uuid", zap.Error(err))
+		c.JSON(http.StatusBadRequest, response.New(
+			response.CodeInvalidFormat,
+			validator.Message(err),
+		))
+		return
+	}
+	err = s.personDb.Destroy(ctx, s.pool, id)
 	if err != nil {
 		s.log.Ctx(ctx).Error(
 			"failed to call personDb.Destroy",
-			zap.Int("Id", uri.Id),
+			zap.String("Id", uri.Id),
 			zap.Error(err),
 		)
 		c.JSON(http.StatusInternalServerError, response.New(
@@ -274,7 +301,7 @@ func (s *personService) Report(c *gin.Context) {
 	x := float64(10)
 	y := float64(10)
 	for _, person := range persons {
-		err = pt.Insert(strconv.Itoa(int(person.ID)), 1, x, y, 100, 14, gopdf.Left|gopdf.Bottom)
+		err = pt.Insert(person.ID.String(), 1, x, y, 100, 14, gopdf.Left|gopdf.Bottom)
 		if err != nil {
 			s.log.Ctx(ctx).Error("failed to insert text", zap.Error(err))
 			c.JSON(http.StatusInternalServerError, response.New(
@@ -284,7 +311,7 @@ func (s *personService) Report(c *gin.Context) {
 			return
 		}
 
-		err = pt.Insert(person.Name, 1, x+12, y, 100, 14, gopdf.Left|gopdf.Bottom)
+		err = pt.Insert(person.Name, 1, x+360, y, 100, 14, gopdf.Left|gopdf.Bottom)
 		if err != nil {
 			s.log.Ctx(ctx).Error("failed to insert text", zap.Error(err))
 			c.JSON(http.StatusInternalServerError, response.New(

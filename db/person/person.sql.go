@@ -7,6 +7,8 @@ package person
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const destroy = `-- name: Destroy :exec
@@ -14,7 +16,7 @@ DELETE FROM person
 WHERE id = $1
 `
 
-func (q *Queries) Destroy(ctx context.Context, db DBTX, id int64) error {
+func (q *Queries) Destroy(ctx context.Context, db DBTX, id uuid.UUID) error {
 	_, err := db.Exec(ctx, destroy, id)
 	return err
 }
@@ -26,7 +28,7 @@ ORDER BY name
 `
 
 type IndexRow struct {
-	ID   int64
+	ID   uuid.UUID
 	Name string
 }
 
@@ -58,11 +60,11 @@ LIMIT 1
 `
 
 type ShowRow struct {
-	ID   int64
+	ID   uuid.UUID
 	Name string
 }
 
-func (q *Queries) Show(ctx context.Context, db DBTX, id int64) (ShowRow, error) {
+func (q *Queries) Show(ctx context.Context, db DBTX, id uuid.UUID) (ShowRow, error) {
 	row := db.QueryRow(ctx, show, id)
 	var i ShowRow
 	err := row.Scan(&i.ID, &i.Name)
@@ -96,7 +98,7 @@ RETURNING id, name, created_at, updated_at
 
 type UpdateParams struct {
 	Name string
-	ID   int64
+	ID   uuid.UUID
 }
 
 func (q *Queries) Update(ctx context.Context, db DBTX, arg UpdateParams) (Person, error) {
