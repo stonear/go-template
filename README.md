@@ -4,12 +4,13 @@
 
 ~~Don't~~ use it for production!
 
-## Clone the project
+## How to Use
 
 ```
-$ git clone https://github.com/stonear/go-template
-$ cd go-template
+$ go install golang.org/x/tools/cmd/gonew@latest
+$ gonew github.com/stonear/go-template github.com/stonear/hello-world
 ```
+That’s it! `gonew` creates the directory for you, and uses the last part of the module name. In this case, that’s hello-world.
 
 ## Running Template
 
