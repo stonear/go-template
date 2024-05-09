@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -23,7 +24,7 @@ func New(lc fx.Lifecycle, log *otelzap.Logger) *pgxpool.Pool {
 	envUsername := os.Getenv("DB_USERNAME")
 	envPassword := os.Getenv("DB_PASSWORD")
 
-	connStr := "postgres://" + envUsername + ":" + envPassword + "@" + envHost + ":" + envPort + "/" + envDatabase + "?sslmode=disable"
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", envUsername, envPassword, envHost, envPort, envDatabase)
 
 	config, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
