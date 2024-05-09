@@ -8,6 +8,7 @@ import (
 	"github.com/stonear/go-template/db/person"
 	"github.com/stonear/go-template/library/httpclient"
 	"github.com/stonear/go-template/library/postgres"
+	"github.com/stonear/go-template/library/redis"
 	"github.com/stonear/go-template/logger"
 	"github.com/stonear/go-template/server"
 	"github.com/stonear/go-template/service"
@@ -28,6 +29,7 @@ func main() {
 		fx.Provide(
 			logger.New,
 			postgres.New,
+			redis.New,
 			httpclient.New,
 
 			person.New,
