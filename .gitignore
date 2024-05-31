@@ -29,5 +29,9 @@ go.work
 # Ignore Mac DS_Store files
 .DS_Store
 
+# sqlc generated files
+# add another here
+db/person/
+
 # dbmate generated files
 db/schema.sql
