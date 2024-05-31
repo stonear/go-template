@@ -301,7 +301,7 @@ func (s *personService) Report(c *gin.Context) {
 	x := float64(10)
 	y := float64(10)
 	for _, person := range persons {
-		err = pt.Insert(person.ID.String(), 1, x, y, 100, 14, gopdf.Left|gopdf.Bottom)
+		err = pt.Insert(person.ID.String(), 1, x, y, 100, 14, gopdf.Left|gopdf.Bottom, nil)
 		if err != nil {
 			s.log.Ctx(ctx).Error("failed to insert text", zap.Error(err))
 			c.JSON(http.StatusInternalServerError, response.New(
@@ -311,7 +311,7 @@ func (s *personService) Report(c *gin.Context) {
 			return
 		}
 
-		err = pt.Insert(person.Name, 1, x+360, y, 100, 14, gopdf.Left|gopdf.Bottom)
+		err = pt.Insert(person.Name, 1, x+360, y, 100, 14, gopdf.Left|gopdf.Bottom, nil)
 		if err != nil {
 			s.log.Ctx(ctx).Error("failed to insert text", zap.Error(err))
 			c.JSON(http.StatusInternalServerError, response.New(
