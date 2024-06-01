@@ -3,12 +3,11 @@ package redis
 import (
 	"context"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
+	"github.com/stonear/go-template/config"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.uber.org/fx"
@@ -19,27 +18,23 @@ type Client struct {
 	*redis.Client
 }
 
-func New(lc fx.Lifecycle, log *otelzap.Logger) *Client {
+func New(lc fx.Lifecycle, config *config.Config, log *otelzap.Logger) *Client {
 	ctx := context.Background()
 
-	envHost := os.Getenv("REDIS_HOST")
-	envPort := os.Getenv("REDIS_PORT")
-	envPassword := os.Getenv("REDIS_PASSWORD")
-	envDatabase := os.Getenv("REDIS_DB")
+	envHost := config.RedisHost
+	envPort := config.RedisPort
+	envPassword := config.RedisPassword
+	envDatabase := config.RedisDb
 
-	addr := fmt.Sprintf("%s:%s", envHost, envPort)
-	DB, err := strconv.Atoi(envDatabase)
-	if err != nil {
-		log.Fatal("[Redis] Invalid env REDIS_DB number", zap.Error(err))
-	}
+	addr := fmt.Sprintf("%s:%d", envHost, envPort)
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: envPassword,
-		DB:       DB,
+		DB:       envDatabase,
 	})
 
-	_, err = rdb.Ping(ctx).Result()
+	_, err := rdb.Ping(ctx).Result()
 	if err != nil {
 		log.Fatal("[Redis] Connection was refused", zap.Error(err))
 	}

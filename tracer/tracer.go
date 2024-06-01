@@ -2,10 +2,9 @@ package tracer
 
 import (
 	"context"
-	"os"
-	"strconv"
 	"time"
 
+	"github.com/stonear/go-template/config"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"github.com/uptrace/uptrace-go/uptrace"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
@@ -13,20 +12,17 @@ import (
 	"go.uber.org/zap"
 )
 
-func Load(lc fx.Lifecycle, log *otelzap.Logger) {
-	enableTelemetryStr := os.Getenv("ENABLE_TELEMETRY")
-	enableTelemetry, _ := strconv.ParseBool(enableTelemetryStr)
-	if !enableTelemetry {
+func Load(lc fx.Lifecycle, config *config.Config, log *otelzap.Logger) {
+	if !config.EnableTelemetry {
+		log.Info("[Tracer] Telemetry is disabled")
 		return
 	}
 
 	// Configure OpenTelemetry with sensible defaults.
 	uptrace.ConfigureOpentelemetry(
-		// copy your project DSN here or use UPTRACE_DSN env var
-		// uptrace.WithDSN("https://token@api.uptrace.dev/project_id"),
-
-		uptrace.WithServiceName(os.Getenv("APP_NAME")),
-		uptrace.WithServiceVersion(os.Getenv("APP_VERSION")),
+		uptrace.WithDSN(config.UptraceDsn),
+		uptrace.WithServiceName(config.AppName),
+		uptrace.WithServiceVersion(config.AppVersion),
 	)
 
 	err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(15 * time.Second))
@@ -36,7 +32,7 @@ func Load(lc fx.Lifecycle, log *otelzap.Logger) {
 
 	lc.Append(fx.Hook{
 		OnStop: func(ctx context.Context) error {
-			if !enableTelemetry {
+			if !config.EnableTelemetry {
 				return nil
 			}
 

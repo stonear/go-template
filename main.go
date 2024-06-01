@@ -39,6 +39,7 @@ func main() {
 		}),
 		fx.Provide(
 			logger.New,
+			config.New,
 			postgres.New,
 			redis.New,
 			httpclient.New,
@@ -52,7 +53,6 @@ func main() {
 			server.New,
 		),
 		fx.Invoke(
-			config.Load,
 			validator.Load,
 			tracer.Load,
 			func(*pgxpool.Pool) {},

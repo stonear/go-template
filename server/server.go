@@ -4,13 +4,13 @@ import (
 	"context"
 	"net"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/pprof"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"github.com/stonear/go-template/config"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel/propagation"
@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func New(lc fx.Lifecycle, log *otelzap.Logger) *gin.Engine {
+func New(lc fx.Lifecycle, config *config.Config, log *otelzap.Logger) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 
 	handler := gin.Default()
@@ -29,7 +29,7 @@ func New(lc fx.Lifecycle, log *otelzap.Logger) *gin.Engine {
 	pprof.Register(handler)
 
 	otelginOption := otelgin.WithPropagators(propagation.TraceContext{})
-	handler.Use(otelgin.Middleware(os.Getenv("APP_NAME"), otelginOption))
+	handler.Use(otelgin.Middleware(config.AppName, otelginOption))
 
 	srv := &http.Server{
 		Addr:    ":8080",

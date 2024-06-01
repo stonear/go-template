@@ -3,41 +3,41 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/exaring/otelpgx"
 	pgxZap "github.com/jackc/pgx-zap"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
+	"github.com/stonear/go-template/config"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
 
-func New(lc fx.Lifecycle, log *otelzap.Logger) *pgxpool.Pool {
+func New(lc fx.Lifecycle, config *config.Config, log *otelzap.Logger) *pgxpool.Pool {
 	ctx := context.Background()
 
-	envHost := os.Getenv("DB_HOST")
-	envPort := os.Getenv("DB_PORT")
-	envDatabase := os.Getenv("DB_DATABASE")
-	envUsername := os.Getenv("DB_USERNAME")
-	envPassword := os.Getenv("DB_PASSWORD")
+	envHost := config.DbHost
+	envPort := config.DbPort
+	envDatabase := config.DbDatabase
+	envUsername := config.DbUsername
+	envPassword := config.DbPassword
 
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", envUsername, envPassword, envHost, envPort, envDatabase)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", envUsername, envPassword, envHost, envPort, envDatabase)
 
-	config, err := pgxpool.ParseConfig(connStr)
+	pgxConfig, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
 		log.Fatal("[Database] Unable to parse connection url", zap.Error(err))
 	}
-	config.MaxConns = 50
-	config.MinConns = 0
-	config.MaxConnLifetime = time.Hour
-	config.MaxConnIdleTime = time.Minute * 30
-	config.HealthCheckPeriod = time.Minute
-	config.ConnConfig.ConnectTimeout = time.Second * 10
-	config.ConnConfig.RuntimeParams["timezone"] = os.Getenv("DB_TZ")
-	config.ConnConfig.Tracer = NewTracer(
+	pgxConfig.MaxConns = 50
+	pgxConfig.MinConns = 0
+	pgxConfig.MaxConnLifetime = time.Hour
+	pgxConfig.MaxConnIdleTime = time.Minute * 30
+	pgxConfig.HealthCheckPeriod = time.Minute
+	pgxConfig.ConnConfig.ConnectTimeout = time.Second * 10
+	pgxConfig.ConnConfig.RuntimeParams["timezone"] = config.DbTz
+	pgxConfig.ConnConfig.Tracer = NewTracer(
 		// zap
 		&tracelog.TraceLog{
 			Logger:   pgxZap.NewLogger(log.Logger),
@@ -47,7 +47,7 @@ func New(lc fx.Lifecycle, log *otelzap.Logger) *pgxpool.Pool {
 		otelpgx.NewTracer(),
 	)
 
-	conn, err := pgxpool.NewWithConfig(ctx, config)
+	conn, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
 		log.Fatal("[Database] Unable to connect to database", zap.Error(err))
 	}
