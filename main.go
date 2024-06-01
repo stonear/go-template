@@ -11,7 +11,8 @@ import (
 	"github.com/stonear/go-template/library/redis"
 	"github.com/stonear/go-template/logger"
 	"github.com/stonear/go-template/server"
-	"github.com/stonear/go-template/service"
+	personService "github.com/stonear/go-template/service/person"
+	pokemonService "github.com/stonear/go-template/service/pokemon"
 	"github.com/stonear/go-template/tracer"
 	"github.com/stonear/go-template/validator"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
@@ -19,6 +20,16 @@ import (
 	"go.uber.org/fx/fxevent"
 )
 
+// @title						Go-Template
+// @version						1.0.0
+// @description					This is an example.
+// @termsOfService				http://swagger.io/terms/
+// @host						localhost:8080
+// @BasePath					/v1
+// @securityDefinitions.apikey	Bearer
+// @in							header
+// @name						Authorization
+// @description					Type "Bearer" followed by a space and JWT token.
 func main() {
 	fx.New(
 		fx.WithLogger(func(log *otelzap.Logger) fxevent.Logger {
@@ -35,8 +46,8 @@ func main() {
 			person.New,
 			pokemon.New,
 
-			service.NewPersonService,
-			service.NewPokemonService,
+			personService.New,
+			pokemonService.New,
 
 			server.New,
 		),

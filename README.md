@@ -16,7 +16,7 @@ That’s it! `gonew` creates the directory for you, and uses the last part of th
 
 ```
 $ // create .env file
-$ make dep
+$ make dep gen
 $ go run .
 ```
 

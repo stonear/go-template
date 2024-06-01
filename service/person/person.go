@@ -1,4 +1,4 @@
-package service
+package person
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type PersonService interface {
+type Service interface {
 	Index(c *gin.Context)
 	Show(c *gin.Context)
 	Store(c *gin.Context)
@@ -27,25 +27,33 @@ type PersonService interface {
 	Report(c *gin.Context)
 }
 
-func NewPersonService(
+func New(
 	log *otelzap.Logger,
 	pool *pgxpool.Pool,
 	personDb *person.Queries,
-) PersonService {
-	return &personService{
+) Service {
+	return &service{
 		log:      log,
 		pool:     pool,
 		personDb: personDb,
 	}
 }
 
-type personService struct {
+type service struct {
 	log      *otelzap.Logger
 	pool     *pgxpool.Pool
 	personDb *person.Queries
 }
 
-func (s *personService) Index(c *gin.Context) {
+// @Summary		Person List
+// @Description	get person list
+// @Tags		person
+// @Accept		json
+// @Produce		json
+// @Success		200		{object}	response.Response{data=[]person.IndexRow}
+// @Failure		500		{object}	response.Response{data=nil}
+// @Router		/person	[get]
+func (s *service) Index(c *gin.Context) {
 	ctx := c.Request.Context()
 	persons, err := s.personDb.Index(ctx, s.pool)
 	if err != nil {
@@ -62,7 +70,16 @@ func (s *personService) Index(c *gin.Context) {
 	))
 }
 
-func (s *personService) Show(c *gin.Context) {
+// @Summary		Person Show
+// @Description	get person by id
+// @Tags		person
+// @Accept		json
+// @Produce		json
+// @Success		200				{object}	response.Response{data=person.ShowRow}
+// @Failure		400,404,500		{object}	response.Response{data=nil}
+// @Param 		id	path	string	true	"Person ID"
+// @Router		/person/{id}	[get]
+func (s *service) Show(c *gin.Context) {
 	ctx := c.Request.Context()
 	type ShowUri struct {
 		Id string `uri:"id" binding:"required,gt=0"`
@@ -112,11 +129,18 @@ func (s *personService) Show(c *gin.Context) {
 	))
 }
 
-func (s *personService) Store(c *gin.Context) {
+// @Summary		Person Store
+// @Description	save person
+// @Tags		person
+// @Accept		json
+// @Produce		json
+// @Param 		request			body		StoreRequest true "request body"
+// @Success		200				{object}	response.Response{data=StoreResponse}
+// @Failure		400,500			{object}	response.Response{data=nil}
+// @Router		/person			[post]
+func (s *service) Store(c *gin.Context) {
 	ctx := c.Request.Context()
-	type StoreRequest struct {
-		Name string `form:"name" binding:"required,notEvil"`
-	}
+
 	var req StoreRequest
 	err := c.ShouldBindWith(&req, binding.JSON)
 	if err != nil {
@@ -140,9 +164,6 @@ func (s *personService) Store(c *gin.Context) {
 		))
 		return
 	}
-	type StoreResponse struct {
-		Id string `json:"id"`
-	}
 	var resp = StoreResponse{
 		Id: person.ID.String(),
 	}
@@ -152,7 +173,17 @@ func (s *personService) Store(c *gin.Context) {
 	))
 }
 
-func (s *personService) Update(c *gin.Context) {
+// @Summary		Person Update
+// @Description	update person
+// @Tags		person
+// @Accept		json
+// @Produce		json
+// @Param 		id 				path 		string true "User ID"
+// @Param 		request			body		UpdateRequest true "request body"
+// @Success		200				{object}	response.Response{data=person.Person{createdAt=time.Time,updatedAt=time.Time}}
+// @Failure		400,500			{object}	response.Response{data=nil}
+// @Router		/person/{id}	[put]
+func (s *service) Update(c *gin.Context) {
 	ctx := c.Request.Context()
 	type UpdateUri struct {
 		Id string `uri:"id" binding:"required,gt=0"`
@@ -167,9 +198,7 @@ func (s *personService) Update(c *gin.Context) {
 		))
 		return
 	}
-	type UpdateRequest struct {
-		Name string `form:"name" binding:"required,notEvil"`
-	}
+
 	var req UpdateRequest
 	err = c.ShouldBindWith(&req, binding.JSON)
 	if err != nil {
@@ -212,7 +241,16 @@ func (s *personService) Update(c *gin.Context) {
 	))
 }
 
-func (s *personService) Destroy(c *gin.Context) {
+// @Summary		Person Destroy
+// @Description	delete person
+// @Tags		person
+// @Accept		json
+// @Produce		json
+// @Param 		id 				path 		string true "User ID"
+// @Success		200				{object}	response.Response{data=nil}
+// @Failure		400,500			{object}	response.Response{data=nil}
+// @Router		/person/{id}	[delete]
+func (s *service) Destroy(c *gin.Context) {
 	ctx := c.Request.Context()
 	type DestroyUri struct {
 		Id string `uri:"id" binding:"required,gt=0"`
@@ -255,7 +293,15 @@ func (s *personService) Destroy(c *gin.Context) {
 	))
 }
 
-func (s *personService) Report(c *gin.Context) {
+// @Summary		Person Report
+// @Description	person list in pdf
+// @Tags		person
+// @Accept		json
+// @Produce		application/pdf
+// @Success		200				{file}		file
+// @Failure		500				{object}	response.Response{data=nil}
+// @Router		/person/report	[get]
+func (s *service) Report(c *gin.Context) {
 	ctx := c.Request.Context()
 	persons, err := s.personDb.Index(ctx, s.pool)
 	if err != nil {
@@ -335,5 +381,6 @@ func (s *personService) Report(c *gin.Context) {
 		return
 	}
 
+	c.Header("Content-Disposition", "attachment; filename=person-list.pdf")
 	c.Data(http.StatusOK, "application/pdf", buffer.Bytes())
 }

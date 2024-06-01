@@ -8,6 +8,8 @@ sql:
         package: "person"
         sql_package: "pgx/v5"
         emit_methods_with_db_argument: true
+        emit_json_tags: true
+        json_tags_case_style: camel
         out: "person"
         overrides:
           - db_type: "uuid"
@@ -25,6 +27,8 @@ sql:
   #       package: "job"
   #       sql_package: "pgx/v5"
   #       emit_methods_with_db_argument: true
+  #       emit_json_tags: true
+  #       json_tags_case_style: camel
   #       out: "job"
   #       overrides:
   #         - db_type: "uuid"

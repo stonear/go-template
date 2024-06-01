@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/pprof"
-	"github.com/gin-contrib/secure"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
@@ -26,10 +25,6 @@ func New(lc fx.Lifecycle, log *otelzap.Logger) *gin.Engine {
 	handler.Use(gzip.Gzip(gzip.DefaultCompression))
 	handler.Use(ginzap.Ginzap(log, time.RFC3339, true))
 	handler.Use(ginzap.RecoveryWithZap(log, true))
-
-	securityConfig := secure.DefaultConfig()
-	securityConfig.SSLRedirect = false
-	handler.Use(secure.New(securityConfig))
 
 	pprof.Register(handler)
 

@@ -35,3 +35,6 @@ db/person/
 
 # dbmate generated files
 db/schema.sql
+
+# swagger docs
+docs/
