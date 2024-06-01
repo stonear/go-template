@@ -3,6 +3,7 @@ package tracer
 import (
 	"context"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
@@ -13,6 +14,12 @@ import (
 )
 
 func Load(lc fx.Lifecycle, log *otelzap.Logger) {
+	enableTelemetryStr := os.Getenv("ENABLE_TELEMETRY")
+	enableTelemetry, _ := strconv.ParseBool(enableTelemetryStr)
+	if !enableTelemetry {
+		return
+	}
+
 	// Configure OpenTelemetry with sensible defaults.
 	uptrace.ConfigureOpentelemetry(
 		// copy your project DSN here or use UPTRACE_DSN env var
@@ -29,6 +36,10 @@ func Load(lc fx.Lifecycle, log *otelzap.Logger) {
 
 	lc.Append(fx.Hook{
 		OnStop: func(ctx context.Context) error {
+			if !enableTelemetry {
+				return nil
+			}
+
 			// Send buffered spans and free resources.
 			return uptrace.Shutdown(ctx)
 		},
