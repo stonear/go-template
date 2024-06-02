@@ -39,6 +39,7 @@ type service struct {
 // @Tags		pokemon
 // @Accept		json
 // @Produce		json
+// @Security	Bearer
 // @Success		200			{object}	response.Response{data=[]pokemon.PokemonList}
 // @Failure		500			{object}	response.Response{data=nil}
 // @Router		/pokemon	[get]

@@ -31,6 +31,7 @@ go.work
 
 # sqlc generated files
 # add another here
+db/auth/
 db/person/
 
 # dbmate generated files

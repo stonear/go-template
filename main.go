@@ -5,12 +5,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stonear/go-template/client/pokemon"
 	"github.com/stonear/go-template/config"
+	"github.com/stonear/go-template/db/auth"
 	"github.com/stonear/go-template/db/person"
 	"github.com/stonear/go-template/library/httpclient"
 	"github.com/stonear/go-template/library/postgres"
 	"github.com/stonear/go-template/library/redis"
 	"github.com/stonear/go-template/logger"
+	"github.com/stonear/go-template/middleware"
 	"github.com/stonear/go-template/server"
+	authService "github.com/stonear/go-template/service/auth"
 	personService "github.com/stonear/go-template/service/person"
 	pokemonService "github.com/stonear/go-template/service/pokemon"
 	"github.com/stonear/go-template/tracer"
@@ -44,11 +47,15 @@ func main() {
 			redis.New,
 			httpclient.New,
 
+			auth.New,
 			person.New,
 			pokemon.New,
 
+			authService.New,
 			personService.New,
 			pokemonService.New,
+
+			middleware.New,
 
 			server.New,
 		),

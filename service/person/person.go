@@ -50,6 +50,7 @@ type service struct {
 // @Tags		person
 // @Accept		json
 // @Produce		json
+// @Security	Bearer
 // @Success		200		{object}	response.Response{data=[]person.IndexRow}
 // @Failure		500		{object}	response.Response{data=nil}
 // @Router		/person	[get]
@@ -75,6 +76,7 @@ func (s *service) Index(c *gin.Context) {
 // @Tags		person
 // @Accept		json
 // @Produce		json
+// @Security	Bearer
 // @Success		200				{object}	response.Response{data=person.ShowRow}
 // @Failure		400,404,500		{object}	response.Response{data=nil}
 // @Param 		id	path	string	true	"Person ID"
@@ -134,6 +136,7 @@ func (s *service) Show(c *gin.Context) {
 // @Tags		person
 // @Accept		json
 // @Produce		json
+// @Security	Bearer
 // @Param 		request			body		StoreRequest true "request body"
 // @Success		200				{object}	response.Response{data=StoreResponse}
 // @Failure		400,500			{object}	response.Response{data=nil}
@@ -178,6 +181,7 @@ func (s *service) Store(c *gin.Context) {
 // @Tags		person
 // @Accept		json
 // @Produce		json
+// @Security	Bearer
 // @Param 		id 				path 		string true "User ID"
 // @Param 		request			body		UpdateRequest true "request body"
 // @Success		200				{object}	response.Response{data=person.Person{createdAt=time.Time,updatedAt=time.Time}}
@@ -246,6 +250,7 @@ func (s *service) Update(c *gin.Context) {
 // @Tags		person
 // @Accept		json
 // @Produce		json
+// @Security	Bearer
 // @Param 		id 				path 		string true "User ID"
 // @Success		200				{object}	response.Response{data=nil}
 // @Failure		400,500			{object}	response.Response{data=nil}
@@ -298,6 +303,7 @@ func (s *service) Destroy(c *gin.Context) {
 // @Tags		person
 // @Accept		json
 // @Produce		application/pdf
+// @Security	Bearer
 // @Success		200				{file}		file
 // @Failure		500				{object}	response.Response{data=nil}
 // @Router		/person/report	[get]

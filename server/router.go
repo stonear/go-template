@@ -4,6 +4,8 @@ import (
 	"github.com/gin-contrib/secure"
 	"github.com/gin-gonic/gin"
 	"github.com/stonear/go-template/docs"
+	"github.com/stonear/go-template/middleware"
+	"github.com/stonear/go-template/service/auth"
 	"github.com/stonear/go-template/service/person"
 	"github.com/stonear/go-template/service/pokemon"
 	swaggerfiles "github.com/swaggo/files"
@@ -12,6 +14,8 @@ import (
 
 func Router(
 	r *gin.Engine,
+	middleware middleware.Middleware,
+	authSvc auth.Service,
 	personSvc person.Service,
 	pokemonSvc pokemon.Service,
 ) {
@@ -21,16 +25,29 @@ func Router(
 	securityConfig := secure.DefaultConfig()
 	securityConfig.SSLRedirect = false
 
-	api := r.Group(basePath).Use(secure.New(securityConfig))
+	api := r.Group(basePath)
+	api.Use(secure.New(securityConfig))
 	{
-		api.GET("/person", personSvc.Index)
-		api.GET("/person/report", personSvc.Report)
-		api.GET("/person/:id", personSvc.Show)
-		api.POST("/person", personSvc.Store)
-		api.PUT("/person/:id", personSvc.Update)
-		api.DELETE("/person/:id", personSvc.Destroy)
+		auth := api.Group("/auth")
+		{
+			auth.POST("/login", authSvc.Login)
+		}
 
-		api.GET("/pokemon", pokemonSvc.Index)
+		protected := api
+		protected.Use(middleware.Auth())
+		{
+			person := protected.Group("/person")
+			{
+				person.GET("", personSvc.Index)
+				person.GET("/report", personSvc.Report)
+				person.GET("/:id", personSvc.Show)
+				person.POST("", personSvc.Store)
+				person.PUT("/:id", personSvc.Update)
+				person.DELETE("/:id", personSvc.Destroy)
+			}
+
+			protected.GET("/pokemon", pokemonSvc.Index)
+		}
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

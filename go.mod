@@ -3,6 +3,7 @@ module github.com/stonear/go-template
 go 1.22
 
 require (
+	aidanwoods.dev/go-paseto v1.5.1
 	github.com/ernesto-jimenez/httplogger v0.0.0-20220128121225-117514c3f345
 	github.com/exaring/otelpgx v0.5.4
 	github.com/gin-contrib/gzip v1.0.1
@@ -18,7 +19,7 @@ require (
 	github.com/redis/go-redis/v9 v9.5.2
 	github.com/signintech/gopdf v0.25.0
 	github.com/signintech/pdft v0.5.0
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.19.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.3
@@ -31,9 +32,11 @@ require (
 	go.opentelemetry.io/otel v1.27.0
 	go.uber.org/fx v1.22.0
 	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.23.0
 )
 
 require (
+	aidanwoods.dev/go-result v0.1.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/bytedance/sonic v1.11.8 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -100,8 +103,7 @@ require (
 	go.uber.org/dig v1.17.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
+	golang.org/x/exp v0.0.0-20240531132922-fd00a4e0eefc // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
