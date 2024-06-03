@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -9,9 +10,14 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/stonear/go-template/config"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
-	"github.com/vmihailenco/msgpack/v5"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+)
+
+const (
+	REDIS_DEFAULT_PATH = "$"
+	// sets the key only if it does not already exist
+	REDIS_SET_MODE_NX = "NX"
 )
 
 type Client struct {
@@ -57,13 +63,14 @@ func New(lc fx.Lifecycle, config *config.Config, log *otelzap.Logger) *Client {
 	return &Client{rdb}
 }
 
-func (c *Client) Remember(ctx context.Context, key string, exp time.Duration, destType any, defaultFunc func() (any, error)) (any, error) {
-	dest := destType
-
-	val, err := c.Get(ctx, key).Result()
+func (c *Client) Remember(ctx context.Context, key string, exp time.Duration, dest any, defaultFunc func() (any, error)) (any, error) {
+	val, err := c.JSONGet(ctx, key, REDIS_DEFAULT_PATH).Result()
 	if err == nil {
-		err = msgpack.Unmarshal([]byte(val), dest)
-		return dest, err
+		var destArr = []any{dest}
+		err = json.Unmarshal([]byte(val), &destArr)
+		if len(destArr) > 0 && err == nil {
+			return destArr[0], nil
+		}
 	}
 
 	dest, err = defaultFunc()
@@ -71,10 +78,13 @@ func (c *Client) Remember(ctx context.Context, key string, exp time.Duration, de
 		return dest, err
 	}
 
-	bytes, err := msgpack.Marshal(dest)
-	if err != nil {
-		return dest, err
-	}
+	_, err = c.Pipelined(ctx, func(rdb redis.Pipeliner) error {
+		err = rdb.JSONSetMode(ctx, key, REDIS_DEFAULT_PATH, dest, REDIS_SET_MODE_NX).Err()
+		if err != nil {
+			return err
+		}
+		return rdb.Expire(ctx, key, exp).Err()
+	})
 
-	return dest, c.Set(ctx, key, bytes, exp).Err()
+	return dest, err
 }

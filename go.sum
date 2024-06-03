@@ -145,8 +145,8 @@ github.com/sagikazarmark/locafero v0.4.0 h1:HApY1R9zGo4DBgr7dqsTH/JJxLTTsOt7u6ke
 github.com/sagikazarmark/locafero v0.4.0/go.mod h1:Pe1W6UlPYUk/+wc/6KFhbORCfqzgYEpgQ3O5fPuL3H4=
 github.com/sagikazarmark/slog-shim v0.1.0 h1:diDBnUNK9N/354PgrxMywXnAwEr1QZcOr6gto+ugjYE=
 github.com/sagikazarmark/slog-shim v0.1.0/go.mod h1:SrcSrq8aKtyuqEI1uvTDTK1arOWRIczQRv+GVI1AkeQ=
-github.com/signintech/gopdf v0.25.0 h1:w+C1RWe89yHqrdU9WZwMoUvmUeeQhNxrmJWfN2h6plQ=
-github.com/signintech/gopdf v0.25.0/go.mod h1:d23eO35GpEliSrF22eJ4bsM3wVeQJTjXTHq5x5qGKjA=
+github.com/signintech/gopdf v0.25.1 h1:6llKXfxY6YyviuPfHJ9PrlSgxslutL45+yyTbJKj8hs=
+github.com/signintech/gopdf v0.25.1/go.mod h1:d23eO35GpEliSrF22eJ4bsM3wVeQJTjXTHq5x5qGKjA=
 github.com/signintech/pdft v0.5.0 h1:1ZRgbXDMNWo0cCvU0P1jR/hprfgfUgwW3nz045ZINJY=
 github.com/signintech/pdft v0.5.0/go.mod h1:RLNpNHoTltzYb1LCohmyiLhDjtVaWzSFVo9nW81sVCk=
 github.com/sourcegraph/conc v0.3.0 h1:OQTbbt6P72L20UqAkXXuLOj79LfEanQ+YQFNpLA9ySo=
@@ -189,10 +189,6 @@ github.com/uptrace/opentelemetry-go-extra/otelzap v0.3.0 h1:sj/jUvwHdJTGPeilGnLc
 github.com/uptrace/opentelemetry-go-extra/otelzap v0.3.0/go.mod h1:hDQ7Ntn6wEgjwtH7xJ1B235xNHhFffl7GHmZqs3WcK8=
 github.com/uptrace/uptrace-go v1.27.1 h1:CIcBWKucTkw1ussNToZA1HNO7+HXOju9zDcFC+MOpOA=
 github.com/uptrace/uptrace-go v1.27.1/go.mod h1:/9tKtcIaxb3GAwPOCqkZ8bhXRR/ZYCsXb9Zs5kh14Eo=
-github.com/vmihailenco/msgpack/v5 v5.4.1 h1:cQriyiUvjTwOHg8QZaPihLWeRAAVoCpE00IUPn0Bjt8=
-github.com/vmihailenco/msgpack/v5 v5.4.1/go.mod h1:GaZTsDaehaPpQVyxrf5mtQlH+pc21PIudVV/E3rRQok=
-github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
-github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.52.0 h1:vkioc4XBfqnZZ7u40wK3Kgbjj9JYkvW6FY1ghmM/Shk=
 go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.52.0/go.mod h1:vsyxiwPzPlijgouF1SRZRGqbuHod8fV6+MRCH7ltxDE=

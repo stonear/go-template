@@ -17,7 +17,7 @@ require (
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/redis/go-redis/extra/redisotel/v9 v9.0.5
 	github.com/redis/go-redis/v9 v9.5.2
-	github.com/signintech/gopdf v0.25.0
+	github.com/signintech/gopdf v0.25.1
 	github.com/signintech/pdft v0.5.0
 	github.com/spf13/viper v1.19.0
 	github.com/swaggo/files v1.0.1
@@ -25,7 +25,6 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.3.0
 	github.com/uptrace/uptrace-go v1.27.1
-	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.52.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.52.0
@@ -87,7 +86,6 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.3.0 // indirect
-	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.3.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.27.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.27.0 // indirect
