@@ -1,0 +1,45 @@
+services:
+  api:
+    build: .
+    env_file:
+      - path: .env
+        required: true
+    ports:
+      - 8080:8080
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis_db:
+        condition: service_healthy
+    restart: always
+  postgres_db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      TZ: ${DB_TZ}
+      PGTZ: ${DB_TZ}
+      PGDATA: /data/postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/data/postgres
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USERNAME} -d ${DB_PASSWORD}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+  redis_db:
+    image: redis/redis-stack-server:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+
+volumes:
+  postgres_data:
+  redis_data:

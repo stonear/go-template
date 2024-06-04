@@ -2,9 +2,9 @@ BINARY_NAME=go-template
 
 build:
 	gen
-	GOARCH=amd64 GOOS=darwin go build -o ${BINARY_NAME}-darwin main.go
-	GOARCH=amd64 GOOS=linux go build -o ${BINARY_NAME}-linux main.go
-	GOARCH=amd64 GOOS=windows go build -o ${BINARY_NAME}-windows main.go
+	GOARCH=amd64 GOOS=darwin go build -a -installsuffix nocgo -o ${BINARY_NAME}-darwin -tags=viper_bind_struct main.go
+	GOARCH=amd64 GOOS=linux go build -a -installsuffix nocgo -o ${BINARY_NAME}-linux -tags=viper_bind_struct main.go
+	GOARCH=amd64 GOOS=windows go build -a -installsuffix nocgo -o ${BINARY_NAME}-windows -tags=viper_bind_struct main.go
 
 run: build
 	./${BINARY_NAME}

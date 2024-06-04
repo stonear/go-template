@@ -52,6 +52,11 @@ func New(lc fx.Lifecycle, config *config.Config, log *otelzap.Logger) *pgxpool.P
 		log.Fatal("[Database] Unable to connect to database", zap.Error(err))
 	}
 
+	err = conn.Ping(ctx)
+	if err != nil {
+		log.Fatal("[Database] Unable to ping database", zap.Error(err))
+	}
+
 	lc.Append(fx.Hook{
 		OnStop: func(ctx context.Context) error {
 			conn.Close()

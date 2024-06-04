@@ -32,14 +32,13 @@ type Config struct {
 }
 
 func New(log *otelzap.Logger) *Config {
+	viper.AutomaticEnv()
 	viper.SetConfigFile(".env")
 	viper.SetConfigType("env")
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Fatal("[Config] configuration file not found", zap.Error(err))
-		} else {
-			log.Fatal("[Config] failed to load configuration file", zap.Error(err))
-		}
+		log.Warn("[Config] failed to load configuration file, use environment variables instead", zap.Error(err))
+	} else {
+		log.Info("[Config] configuration file loaded", zap.String("config file", viper.ConfigFileUsed()))
 	}
 
 	var config Config

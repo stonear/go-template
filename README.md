@@ -16,8 +16,8 @@ That’s it! `gonew` creates the directory for you, and uses the last part of th
 
 ```
 $ // create .env file
-$ make dep gen
-$ go run .
+$ docker compose up -d
+$ // dont forget to run migration for the first time (dbmate migrate)
 ```
 
 ## Create Migration
