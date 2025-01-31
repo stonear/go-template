@@ -7,6 +7,7 @@ import (
 
 	"github.com/exaring/otelpgx"
 	pgxZap "github.com/jackc/pgx-zap"
+	"github.com/jackc/pgx/v5/multitracer"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/stonear/go-template/config"
@@ -37,7 +38,7 @@ func New(lc fx.Lifecycle, config *config.Config, log *otelzap.Logger) *pgxpool.P
 	pgxConfig.HealthCheckPeriod = time.Minute
 	pgxConfig.ConnConfig.ConnectTimeout = time.Second * 10
 	pgxConfig.ConnConfig.RuntimeParams["timezone"] = config.DbTz
-	pgxConfig.ConnConfig.Tracer = NewTracer(
+	pgxConfig.ConnConfig.Tracer = multitracer.New(
 		// zap
 		&tracelog.TraceLog{
 			Logger:   pgxZap.NewLogger(log.Logger),
