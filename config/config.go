@@ -27,8 +27,9 @@ type Config struct {
 	RedisPassword string `mapstructure:"REDIS_PASSWORD"`
 	RedisDb       int    `mapstructure:"REDIS_DB"`
 
-	EnableTelemetry bool   `mapstructure:"ENABLE_TELEMETRY"`
-	UptraceDsn      string `mapstructure:"UPTRACE_DSN"`
+	EnableTelemetry          bool   `mapstructure:"ENABLE_TELEMETRY"`
+	OtelExporterOtlpEndpoint string `mapstructure:"OTEL_EXPORTER_OTLP_ENDPOINT"`
+	OtelExporterOtlpHeaders  string `mapstructure:"OTEL_EXPORTER_OTLP_HEADERS"`
 }
 
 func New(log *otelzap.Logger) *Config {

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/secure"
 	"github.com/gin-gonic/gin"
 	"github.com/stonear/go-template/docs"
@@ -22,10 +23,14 @@ func Router(
 	basePath := "/v1"
 	docs.SwaggerInfo.BasePath = basePath
 
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+
 	securityConfig := secure.DefaultConfig()
 	securityConfig.SSLRedirect = false
 
 	api := r.Group(basePath)
+	api.Use(cors.New(corsConfig))
 	api.Use(secure.New(securityConfig))
 	{
 		auth := api.Group("/auth")
