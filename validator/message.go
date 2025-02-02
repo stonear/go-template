@@ -4,7 +4,16 @@ import (
 	"errors"
 	"fmt"
 
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+)
+
+var (
+	trans ut.Translator
+
+	DefaultValidatorMessage = map[string]string{
+		"notEvil": "Go away you evil person",
+	}
 )
 
 func Message(err error) []string {
@@ -12,8 +21,14 @@ func Message(err error) []string {
 	if err != nil && errors.As(err, &ve) {
 		msg := make([]string, len(ve))
 		for i, fe := range ve {
+			// First try custom message
 			customMsg := DefaultValidatorMessage[fe.Tag()]
+			if customMsg == "" && trans != nil {
+				// Then try translation
+				customMsg = fe.Translate(trans)
+			}
 			if customMsg == "" {
+				// Finally fallback to default error
 				customMsg = fe.Error()
 			}
 			msg[i] = fmt.Sprintf("%s: %s", fe.Field(), customMsg)
@@ -22,10 +37,3 @@ func Message(err error) []string {
 	}
 	return []string{}
 }
-
-var (
-	DefaultValidatorMessage = map[string]string{
-		"required": "This field is required",
-		"notEvil":  "Go away you evil person",
-	}
-)
